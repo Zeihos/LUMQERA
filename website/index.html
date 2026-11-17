@@ -24,7 +24,7 @@
       <nav class="main-nav" id="site-nav" aria-label="Основная навигация">
         <a href="#about">О проекте</a><a href="#gameplay">Режим</a><a href="#clans">Кланы</a><a href="#outposts">Точки</a><a href="#economy">Экономика</a><a href="#rating">Рейтинг</a><a href="#roadmap">Разработка</a><a href="#faq">FAQ</a>
       </nav>
-      <a class="nav-community" href="https://vk.com/" target="_blank" rel="noopener noreferrer" data-vk-placeholder="true">Наше сообщество <span aria-hidden="true">↗</span></a>
+      <a class="nav-community" href="https://github.com/Zeihos/LUMQERA" target="_blank" rel="noopener noreferrer">GitHub проекта <span aria-hidden="true">↗</span></a>
     </header>
 
     <main id="top">
@@ -67,7 +67,7 @@
 
       <section class="section clan-section" id="clans">
         <div class="clan-card">
-          <div class="clan-text"><p class="kicker">03 / КЛАНЫ</p><h2>ОДИН ВОИН — СИЛА.<br><span>КЛАН — ЛЕГЕНДА.</span></h2><p>Уже реализованы в исходном коде: создание клана, приглашения, офицеры, смена главы, выход и исключение участников, запрет прямого урона союзникам. В v0.5 появились вызовы на войну, учёт боевых очков и контрольные точки. Разрушительные осады баз пока в планах.</p>
+          <div class="clan-text"><p class="kicker">03 / КЛАНЫ</p><h2>ОДИН ВОИН — СИЛА.<br><span>КЛАН — ЛЕГЕНДА.</span></h2><p>Уже реализованы в исходном коде: создание клана, приглашения, офицеры, смена главы, выход и исключение участников, запрет прямого урона союзникам. В исходниках также есть вызовы на войну, учёт боевых очков и контрольные точки. Разрушительные осады баз пока в планах.</p>
             <div class="command-group"><span>Примеры игровых команд</span><code>/clan create NAME</code><code>/clan invite NICK</code><code>/clan accept</code><code>/top clans</code><code>/claim</code><code>/clan sethome</code><code>/clan home</code><code>/spawn</code><code>/combat</code><code>/war challenge NOVA</code><code>/war info</code><code>/outpost list</code><code>/balance</code><code>/pay NICK 100</code><code>/treasury</code><code>/shop list</code><code>/trade request NICK</code></div>
           </div>
           <div class="clan-crest" aria-hidden="true"><div class="crest-top">LUMQERA</div><div class="crest-center">L</div><div class="crest-bottom">UNITED BY POWER</div></div>
@@ -83,18 +83,18 @@
       </section>
 
       <section class="section" id="economy" aria-labelledby="economy-heading">
-        <div class="section-heading"><p class="kicker">05 / ЭКОНОМИКА</p><h2 id="economy-heading">МОНЕТЫ И <span>ЧЕСТНАЯ ТОРГОВЛЯ</span></h2><p>Собственная экономика включает личный кошелёк, клановую казну, PvP-награды и магазин. В v0.8 добавлены игровые GUI-меню с отдельным подтверждением покупки. В v1.0.0-RC3 улучшен прототип прямого обмена предметами между двумя игроками рядом, с двойным подтверждением. Аукцион пока в разработке.</p></div>
+        <div class="section-heading"><p class="kicker">05 / ЭКОНОМИКА</p><h2 id="economy-heading">МОНЕТЫ И <span>ЧЕСТНАЯ ТОРГОВЛЯ</span></h2><p>Собственная экономика включает личный кошелёк, клановую казну, PvP-награды и магазин. В коде есть игровые GUI-меню и прототип прямого обмена предметами между двумя игроками поблизости, с двойным подтверждением. Для этих механик ещё необходимы полноценные игровые тесты.</p></div>
         <div class="feature-grid">
           <article class="feature-card"><div class="feature-icon">◇</div><span class="feature-index">01</span><h3>Личный кошелёк</h3><p>Баланс хранится в отдельном файле и не обнуляется при переподключении.</p><span class="feature-label">/balance</span></article>
           <article class="feature-card"><div class="feature-icon">⇄</div><span class="feature-index">02</span><h3>Переводы</h3><p>Монеты можно отправлять другому игроку онлайн. Действуют лимиты и защита от ошибочных сумм.</p><span class="feature-label">/pay NICK 100</span></article>
           <article class="feature-card"><div class="feature-icon">⚔</div><span class="feature-index">03</span><h3>PvP-награды</h3><p>Награда начисляется только за засчитанные убийства с учётом антифарма.</p><span class="feature-label">+20 МОНЕТ</span></article>
           <article class="feature-card"><div class="feature-icon">♜</div><span class="feature-index">04</span><h3>Клановая казна</h3><p>Участники пополняют общие средства, глава или офицеры могут выводить монеты. Суммы учитываются вместе с личными кошельками.</p><span class="feature-label">/treasury</span></article>
         </div>
-        <div class="section-heading" style="margin-top: 32px"><p class="kicker">ИГРОВОЙ МАГАЗИН / DEV PREVIEW</p><h3>ТОВАРЫ ЗА <span>МОНЕТЫ</span></h3><p>Тестовый ассортимент из конфигурации: 16 камня за 20, 16 дубовых брёвен за 50, 8 железных слитков за 80, 16 готовой говядины за 60, 16 стрел за 30 монет. Цены администратор может изменить перед запуском.</p><p><code>/menu</code> · <code>/menu shop</code> · <code>/shop buy stone 2</code> · <code>/treasury deposit 100</code> · <code>/trade request NICK</code> · <code>/trade view</code></p><p><strong>Прямой обмен · v1.0.0-RC3:</strong> игроки поблизости предлагают предмет в основной руке через <code>/trade offer</code>, просматривают оба предложения с <code>/trade status</code> и подтверждают через <code>/trade confirm</code> или в меню <code>/trade view</code>. При ошибке или выходе из игры предложение отменяется без хранения предметов в отдельном хранилище. Механика ещё не прошла тест на Paper.</p></div>
+        <div class="section-heading" style="margin-top: 32px"><p class="kicker">ИГРОВОЙ МАГАЗИН / DEV PREVIEW</p><h3>ТОВАРЫ ЗА <span>МОНЕТЫ</span></h3><p>Тестовый ассортимент из конфигурации: 16 камня за 20, 16 дубовых брёвен за 50, 8 железных слитков за 80, 16 готовой говядины за 60, 16 стрел за 30 монет. Цены администратор может изменить перед запуском.</p><p><code>/menu</code> · <code>/menu shop</code> · <code>/shop buy stone 2</code> · <code>/treasury deposit 100</code> · <code>/trade request NICK</code> · <code>/trade view</code></p><p><strong>Прямой обмен · тестовая механика:</strong> игроки поблизости предлагают предмет в основной руке через <code>/trade offer</code>, просматривают оба предложения с <code>/trade status</code> и подтверждают через <code>/trade confirm</code> или в меню <code>/trade view</code>. При ошибке или выходе из игры предложение отменяется без хранения предметов в отдельном хранилище. Механика ещё не прошла тест на Paper.</p></div>
       </section>
 
       <section class="section ratings-section" id="rating" aria-labelledby="rating-heading">
-        <div class="section-heading"><p class="kicker">04 / СТАТИСТИКА</p><h2 id="rating-heading">РЕЙТИНГ <span>ИГРОКОВ И КЛАНОВ</span></h2><p>Счётчики получены из игрового ядра LUMQERA. До закрытого тестирования таблицы могут оставаться пустыми — мы не показываем выдуманную статистику.</p></div>
+        <div class="section-heading"><p class="kicker">06 / СТАТИСТИКА</p><h2 id="rating-heading">РЕЙТИНГ <span>ИГРОКОВ И КЛАНОВ</span></h2><p>Счётчики получены из игрового ядра LUMQERA. До закрытого тестирования таблицы могут оставаться пустыми — мы не показываем выдуманную статистику.</p></div>
         <div class="rating-panel">
           <div class="rating-toolbar"><div class="rating-tabs" role="group" aria-label="Тип рейтинга"><button class="rating-tab is-active" type="button" data-rating-tab="clans" aria-pressed="true">⚔ Кланы</button><button class="rating-tab" type="button" data-rating-tab="players" aria-pressed="false">◆ PvP-игроки</button></div><button class="refresh-rating" id="refresh-rating" type="button" title="Обновить рейтинг">↻ Обновить</button></div>
           <div class="ranking-header" id="ranking-header"><span>МЕСТО / НАЗВАНИЕ</span><span>ИГРОКИ / ЧАНКИ</span><span>ВЛИЯНИЕ</span></div>
@@ -104,7 +104,7 @@
       </section>
 
       <section class="section" id="roadmap">
-        <div class="section-heading"><p class="kicker">05 / ПЛАН РАЗРАБОТКИ</p><h2>ПУТЬ К <span>ОТКРЫТИЮ</span></h2><p>Этапы без выдуманных дат и обещаний. Публиковать сроки будем после технических проверок.</p></div>
+        <div class="section-heading"><p class="kicker">07 / ПЛАН РАЗРАБОТКИ</p><h2>ПУТЬ К <span>ОТКРЫТИЮ</span></h2><p>Этапы без выдуманных дат и обещаний. Публиковать сроки будем после технических проверок.</p></div>
         <div class="roadmap">
           <article class="roadmap-item active"><span class="roadmap-index">01</span><div><strong>Фундамент проекта</strong><p>Сайт, кланы с ролями, PvP-статистика, клановые территории, войны, аванпосты, базы и PvP-тег. Проверка на Paper ещё впереди.</p></div><span class="roadmap-status">В РАБОТЕ</span></article>
           <article class="roadmap-item"><span class="roadmap-index">02</span><div><strong>Тестовый игровой сервер</strong><p>Проверить защиту территорий, телепортацию и PvP-тег на настоящем Paper с несколькими игроками.</p></div><span class="roadmap-status">ПЛАН</span></article>
@@ -114,7 +114,7 @@
       </section>
 
       <section class="section faq-section" id="faq">
-        <div class="section-heading"><p class="kicker">06 / ВОПРОСЫ</p><h2>ЧАСТЫЕ <span>ВОПРОСЫ</span></h2></div>
+        <div class="section-heading"><p class="kicker">08 / ВОПРОСЫ</p><h2>ЧАСТЫЕ <span>ВОПРОСЫ</span></h2></div>
         <div class="faq-list">
           <details><summary>Когда откроется LUMQERA?<span>+</span></summary><p>Дата открытия ещё не утверждена. Сначала подготовим рабочий сервер, проверим игровые механики и проведём тестирование.</p></details>
           <details><summary>Можно ли уже зайти на сервер?<span>+</span></summary><p>Нет. Адрес игрового сервера и поддерживаемая версия появятся после настройки и тестов.</p></details>

@@ -5,14 +5,20 @@ on:
     branches: [main]
     paths:
       - 'server/LumqeraCore/**'
-      - 'build-plugin-windows.bat'
       - 'website/**'
+      - 'tests/**'
+      - 'start-server-windows.bat'
+      - 'deploy-plugin-windows.*'
+      - 'readiness-check-windows.ps1'
       - '.github/workflows/build.yml'
   pull_request:
     paths:
       - 'server/LumqeraCore/**'
-      - 'build-plugin-windows.bat'
       - 'website/**'
+      - 'tests/**'
+      - 'start-server-windows.bat'
+      - 'deploy-plugin-windows.*'
+      - 'readiness-check-windows.ps1'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
@@ -35,6 +41,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Set up Gradle 9.1.0
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -42,10 +52,25 @@ jobs:
       - name: Compile and test plugin
         working-directory: server/LumqeraCore
         run: gradle clean build --no-daemon --console plain --stacktrace
-      - name: Validate website syntax
+      - name: Validate and smoke-test website
         run: |
           node --check website/dev-server.mjs
           node --check website/app.js
+          node --test tests/website-smoke.test.mjs
+      - name: Verify plugin deploy and backup (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $paper = Join-Path $env:RUNNER_TEMP 'lumqera-test-paper'
+          $jar = 'server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC7.jar'
+          ./deploy-plugin-windows.ps1 -Source $jar -ServerDir $paper -NonInteractive
+          if (-not (Test-Path "$paper/plugins/LumqeraCore.jar")) { throw 'No installed plugin JAR' }
+          ./deploy-plugin-windows.ps1 -Source $jar -ServerDir $paper -NonInteractive
+          $backups = @(Get-ChildItem "$paper/plugins/LumqeraCore-*.jar.bak")
+          if ($backups.Count -ne 1) { throw 'Plugin backup was not created on redeploy' }
+          if ((Get-FileHash $jar).Hash -ne (Get-FileHash "$paper/plugins/LumqeraCore.jar").Hash) {
+            throw 'Installed JAR differs from build artifact'
+          }
       - name: Publish test diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -54,6 +79,7 @@ jobs:
           path: server/LumqeraCore/build/test-results/
           if-no-files-found: warn
       - name: Publish compiled plugin JAR
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: LumqeraCore-${{ matrix.os }}-${{ github.run_number }}
