@@ -69,8 +69,8 @@ if errorlevel 1 goto no_source
 echo [INFO] Checking Gradle...
 call "%GRADLE_CMD%" --version >> "%LOG%" 2>&1
 if errorlevel 1 goto gradle_failed
-echo [INFO] Building LumqeraCore. Gradle will fetch Paper API dependencies.
-call "%GRADLE_CMD%" clean build --no-daemon --console=plain --stacktrace >> "%LOG%" 2>&1
+echo [INFO] Assembling LumqeraCore JAR. Full tests run in GitHub Actions.
+call "%GRADLE_CMD%" clean assemble --no-daemon --console=plain --stacktrace >> "%LOG%" 2>&1
 set "BUILD_EXIT=%ERRORLEVEL%"
 if not "%BUILD_EXIT%"=="0" goto build_failed
 set "OUTPUT=%PROJECT%\build\libs\LumqeraCore-1.0.0-RC6.jar"
