@@ -1,0 +1,4 @@
+[16:33:13] [ServerMain/INFO]: [bootstrap] Running Java 25 (Java HotSpot(TM) 64-Bit Server VM 25.0.5.0.2+1-LTS-2; Oracle Corporation null) on Windows 10 10.0 (amd64)
+[16:33:13] [ServerMain/INFO]: [bootstrap] Loading Paper 26.3-228-main@2e549d6 (2026-10-29T08:14:30Z) for Minecraft 26.3
+[16:33:13] [ServerMain/INFO]: [PluginInitializerManager] Initializing plugins...
+[16:33:14] [ServerMain/INFO]: [PluginInitializerManager] Initialized 0 plugins
