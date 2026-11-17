@@ -37,9 +37,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.1.0'
-      - name: Compile and test plugin
+      # On Windows, Gradle's JUnit worker may not load classes from a Cyrillic
+      # workspace path. Copy the *same sources* to a temporary ASCII-only path.
+      - name: Stage Windows sources in ASCII path
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Copy-Item -LiteralPath 'Файлы/server/LumqeraCore' -Destination (Join-Path $env:RUNNER_TEMP 'LumqeraCore') -Recurse
+      - name: Compile and test plugin (Linux)
+        if: runner.os != 'Windows'
         working-directory: Файлы/server/LumqeraCore
-        run: gradle clean build --no-daemon --console plain --stacktrace --info
+        run: gradle clean build --no-daemon --console plain --stacktrace
+      - name: Compile and test plugin (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ${{ runner.temp }}/LumqeraCore
+        run: gradle clean build --no-daemon --console plain --stacktrace
       - name: Publish test diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -47,11 +58,13 @@ jobs:
           name: LumqeraCore-test-diagnostics-${{ matrix.os }}-${{ github.run_number }}
           path: |
             Файлы/server/LumqeraCore/build/test-results/
-            Файлы/server/LumqeraCore/build/reports/tests/
+            ${{ runner.temp }}/LumqeraCore/build/test-results/
           if-no-files-found: warn
       - name: Publish compiled plugin JAR
         uses: actions/upload-artifact@v4
         with:
           name: LumqeraCore-${{ matrix.os }}-${{ github.run_number }}
-          path: Файлы/server/LumqeraCore/build/libs/*.jar
+          path: |
+            Файлы/server/LumqeraCore/build/libs/*.jar
+            ${{ runner.temp }}/LumqeraCore/build/libs/*.jar
           if-no-files-found: error
