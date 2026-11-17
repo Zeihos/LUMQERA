@@ -1,0 +1,22 @@
+# Build output and local tooling
+**/.gradle/
+**/build/
+**/out/
+**/*.class
+**/.idea/
+**/.vscode/
+**/*.log
+**/*.tmp
+**/gradle-*.zip
+
+# Never add locally generated Paper server state to new commits
+Файлы/server/paper/logs/
+Файлы/server/paper/world/
+Файлы/server/paper/world_nether/
+Файлы/server/paper/world_the_end/
+Файлы/server/paper/plugins/
+Файлы/server/paper/eula.txt
+Файлы/server/paper/ops.json
+Файлы/server/paper/whitelist.json
+Файлы/server/paper/usercache.json
+**/session.lock

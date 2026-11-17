@@ -1,0 +1,48 @@
+name: LumqeraCore - Paper build
+
+on:
+  push:
+    branches: [main, 'dev/**']
+    paths:
+      - 'Файлы/server/LumqeraCore/**'
+      - 'Файлы/build-plugin-windows.bat'
+      - '.github/workflows/build.yml'
+  pull_request:
+    paths:
+      - 'Файлы/server/LumqeraCore/**'
+      - 'Файлы/build-plugin-windows.bat'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: JDK 25 / Gradle 9.1.0 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Set up Gradle 9.1.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.1.0'
+      - name: Compile and test plugin
+        working-directory: Файлы/server/LumqeraCore
+        run: gradle clean build --no-daemon --console plain
+      - name: Publish compiled plugin JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: LumqeraCore-${{ matrix.os }}-${{ github.run_number }}
+          path: Файлы/server/LumqeraCore/build/libs/*.jar
+          if-no-files-found: error
