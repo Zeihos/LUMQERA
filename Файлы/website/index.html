@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10091e">
+  <meta name="description" content="LUMQERA — разрабатываемый Minecraft-проект с кланами, PvP и собственным игровым миром. Следите за разработкой.">
+  <title>LUMQERA — Minecraft • Кланы и PvP</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="LUMQERA — главная">
+        <span class="brand-avatar"><img src="assets/community-avatar.png" alt="" width="44" height="44"></span>
+        <span class="brand-name">LUM<span>QERA</span><small>MINECRAFT PROJECT</small></span>
+      </a>
+      <button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav class="main-nav" id="site-nav" aria-label="Основная навигация">
+        <a href="#about">О проекте</a><a href="#gameplay">Режим</a><a href="#clans">Кланы</a><a href="#outposts">Точки</a><a href="#economy">Экономика</a><a href="#rating">Рейтинг</a><a href="#roadmap">Разработка</a><a href="#faq">FAQ</a>
+      </nav>
+      <a class="nav-community" href="https://vk.com/" target="_blank" rel="noopener noreferrer" data-vk-placeholder="true">Наше сообщество <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="signal-dot"></span> НОВЫЙ MINECRAFT-ПРОЕКТ · В РАЗРАБОТКЕ</p>
+          <h1 id="hero-title">ТВОЯ ИСТОРИЯ.<br><em>ТВОЙ КЛАН.</em><br>ТВОИ ПРАВИЛА.</h1>
+          <p class="hero-description">LUMQERA — мир, где каждый союз имеет значение, каждая территория на счету, а победа принадлежит тем, кто умеет сражаться и играть командой.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#gameplay">Исследовать проект <span aria-hidden="true">↗</span></a><a class="button button-ghost" href="#roadmap">Этапы запуска <span aria-hidden="true">↓</span></a></div>
+          <div class="hero-footnote"><span class="mini-icon">◇</span> Java Edition — основная платформа <span class="separator"></span> Версия и дата старта будут объявлены отдельно</div>
+        </div>
+        <div class="hero-art" aria-label="Декоративная композиция в стиле LUMQERA">
+          <div class="orbit orbit-outer"></div><div class="orbit orbit-middle"></div><div class="orbit orbit-inner"></div>
+          <div class="diamond diamond-top"></div><div class="diamond diamond-bottom"></div>
+          <div class="sigil"><span>L</span></div><div class="sigil-reflection"></div>
+          <div class="art-caption">THE CLAN ERA <b>·</b> 001</div><div class="art-caption-right">LQ<br>26</div>
+        </div>
+      </section>
+
+      <section class="info-strip" aria-label="Статус проекта">
+        <div><span class="strip-icon">✦</span><span><strong>СТАТУС</strong><small>Прототип ядра v1.0.0-RC6</small></span></div>
+        <div><span class="strip-icon">⚔</span><span><strong>ОСНОВА</strong><small>PvP / Кланы / Survival</small></span></div>
+        <div><span class="strip-icon">◎</span><span><strong>ПОДКЛЮЧЕНИЕ</strong><small>Пока недоступно</small></span></div>
+      </section>
+
+      <section class="section introduction" id="about">
+        <div class="section-heading"><p class="kicker">01 / КОНЦЕПЦИЯ</p><h2>НЕ ПРОСТО <span>ВЫЖИВАНИЕ</span></h2><p>Мы проектируем сервер вокруг противостояния кланов, осмысленного прогресса и честного PvP.</p></div>
+        <div class="about-visual"><span class="about-number">01—04</span><h3>Построй базу.<br>Создай союз.<br>Защити своё.</h3><div class="accent-line"></div></div>
+      </section>
+
+      <section class="section" id="gameplay">
+        <div class="section-heading"><p class="kicker">02 / ИГРОВОЙ ПРОЦЕСС</p><h2>ЧЕТЫРЕ СТОЛПА <span>LUMQERA</span></h2><p>У каждого действия есть смысл: ресурсы питают экономику, экономика усиливает кланы, а кланы борются за влияние.</p></div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="feature-icon">⚔</div><span class="feature-index">01</span><h3>PvP-сражения</h3><p>Бои с PvP-тегом, антифармом, клановыми войнами и захватом PvP-точек. Честная экипировка и события — в планах.</p><span class="feature-label">БОЕВАЯ СИСТЕМА</span></article>
+          <article class="feature-card"><div class="feature-icon">♜</div><span class="feature-index">02</span><h3>Клановая система</h3><p>Создавайте команды, защищайте чанки, объявляйте войны другим кланам и побеждайте в рейтинге.</p><span class="feature-label">КОМАНДНАЯ ИГРА</span></article>
+          <article class="feature-card"><div class="feature-icon">◆</div><span class="feature-index">03</span><h3>Выживание</h3><p>Исследование мира, добыча ресурсов, строительство и укрепление базы — фундамент вашего развития.</p><span class="feature-label">ОТКРЫТЫЙ МИР</span></article>
+          <article class="feature-card"><div class="feature-icon">◈</div><span class="feature-index">04</span><h3>Сезоны и рейтинг</h3><p>Клановые очки, соревнования и сезонные награды. Параметры сезонов определим по итогам тестов.</p><span class="feature-label">ДОЛГОСРОЧНАЯ ЦЕЛЬ</span></article>
+        </div>
+      </section>
+
+      <section class="section clan-section" id="clans">
+        <div class="clan-card">
+          <div class="clan-text"><p class="kicker">03 / КЛАНЫ</p><h2>ОДИН ВОИН — СИЛА.<br><span>КЛАН — ЛЕГЕНДА.</span></h2><p>Уже реализованы в исходном коде: создание клана, приглашения, офицеры, смена главы, выход и исключение участников, запрет прямого урона союзникам. В v0.5 появились вызовы на войну, учёт боевых очков и контрольные точки. Разрушительные осады баз пока в планах.</p>
+            <div class="command-group"><span>Примеры игровых команд</span><code>/clan create NAME</code><code>/clan invite NICK</code><code>/clan accept</code><code>/top clans</code><code>/claim</code><code>/clan sethome</code><code>/clan home</code><code>/spawn</code><code>/combat</code><code>/war challenge NOVA</code><code>/war info</code><code>/outpost list</code><code>/balance</code><code>/pay NICK 100</code><code>/treasury</code><code>/shop list</code><code>/trade request NICK</code></div>
+          </div>
+          <div class="clan-crest" aria-hidden="true"><div class="crest-top">LUMQERA</div><div class="crest-center">L</div><div class="crest-bottom">UNITED BY POWER</div></div>
+        </div>
+      </section>
+
+
+      <section class="section" id="outposts" aria-labelledby="outposts-heading">
+        <div class="section-heading"><p class="kicker">04 / КОНТРОЛЬНЫЕ ТОЧКИ</p><h2 id="outposts-heading">БОРЬБА ЗА <span>ВЛИЯНИЕ</span></h2><p>Захватите нейтральный аванпост двумя участниками клана, удерживайте его без соперников и получайте влияние. Во время спора захват останавливается. Список точек появляется здесь после синхронизации с сервером.</p></div>
+        <div class="rating-panel"><div class="ranking-header"><span>КОНТРОЛЬНАЯ ТОЧКА</span><span>ТЕКУЩИЙ ВЛАДЕЛЕЦ</span><span>СТАТУС</span></div>
+          <div id="outpost-results" class="rating-results" aria-live="polite"><p class="empty-rating">Пока контрольные точки не опубликованы.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="economy" aria-labelledby="economy-heading">
+        <div class="section-heading"><p class="kicker">05 / ЭКОНОМИКА</p><h2 id="economy-heading">МОНЕТЫ И <span>ЧЕСТНАЯ ТОРГОВЛЯ</span></h2><p>Собственная экономика включает личный кошелёк, клановую казну, PvP-награды и магазин. В v0.8 добавлены игровые GUI-меню с отдельным подтверждением покупки. В v1.0.0-RC3 улучшен прототип прямого обмена предметами между двумя игроками рядом, с двойным подтверждением. Аукцион пока в разработке.</p></div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="feature-icon">◇</div><span class="feature-index">01</span><h3>Личный кошелёк</h3><p>Баланс хранится в отдельном файле и не обнуляется при переподключении.</p><span class="feature-label">/balance</span></article>
+          <article class="feature-card"><div class="feature-icon">⇄</div><span class="feature-index">02</span><h3>Переводы</h3><p>Монеты можно отправлять другому игроку онлайн. Действуют лимиты и защита от ошибочных сумм.</p><span class="feature-label">/pay NICK 100</span></article>
+          <article class="feature-card"><div class="feature-icon">⚔</div><span class="feature-index">03</span><h3>PvP-награды</h3><p>Награда начисляется только за засчитанные убийства с учётом антифарма.</p><span class="feature-label">+20 МОНЕТ</span></article>
+          <article class="feature-card"><div class="feature-icon">♜</div><span class="feature-index">04</span><h3>Клановая казна</h3><p>Участники пополняют общие средства, глава или офицеры могут выводить монеты. Суммы учитываются вместе с личными кошельками.</p><span class="feature-label">/treasury</span></article>
+        </div>
+        <div class="section-heading" style="margin-top: 32px"><p class="kicker">ИГРОВОЙ МАГАЗИН / DEV PREVIEW</p><h3>ТОВАРЫ ЗА <span>МОНЕТЫ</span></h3><p>Тестовый ассортимент из конфигурации: 16 камня за 20, 16 дубовых брёвен за 50, 8 железных слитков за 80, 16 готовой говядины за 60, 16 стрел за 30 монет. Цены администратор может изменить перед запуском.</p><p><code>/menu</code> · <code>/menu shop</code> · <code>/shop buy stone 2</code> · <code>/treasury deposit 100</code> · <code>/trade request NICK</code> · <code>/trade view</code></p><p><strong>Прямой обмен · v1.0.0-RC3:</strong> игроки поблизости предлагают предмет в основной руке через <code>/trade offer</code>, просматривают оба предложения с <code>/trade status</code> и подтверждают через <code>/trade confirm</code> или в меню <code>/trade view</code>. При ошибке или выходе из игры предложение отменяется без хранения предметов в отдельном хранилище. Механика ещё не прошла тест на Paper.</p></div>
+      </section>
+
+      <section class="section ratings-section" id="rating" aria-labelledby="rating-heading">
+        <div class="section-heading"><p class="kicker">04 / СТАТИСТИКА</p><h2 id="rating-heading">РЕЙТИНГ <span>ИГРОКОВ И КЛАНОВ</span></h2><p>Счётчики получены из игрового ядра LUMQERA. До закрытого тестирования таблицы могут оставаться пустыми — мы не показываем выдуманную статистику.</p></div>
+        <div class="rating-panel">
+          <div class="rating-toolbar"><div class="rating-tabs" role="group" aria-label="Тип рейтинга"><button class="rating-tab is-active" type="button" data-rating-tab="clans" aria-pressed="true">⚔ Кланы</button><button class="rating-tab" type="button" data-rating-tab="players" aria-pressed="false">◆ PvP-игроки</button></div><button class="refresh-rating" id="refresh-rating" type="button" title="Обновить рейтинг">↻ Обновить</button></div>
+          <div class="ranking-header" id="ranking-header"><span>МЕСТО / НАЗВАНИЕ</span><span>ИГРОКИ / ЧАНКИ</span><span>ВЛИЯНИЕ</span></div>
+          <div id="rating-results" class="rating-results" aria-live="polite"><p class="empty-rating">Загружаем рейтинг…</p></div>
+          <div class="rating-footer"><span id="rating-updated">Статистика ещё не опубликована</span><span>Публикуется после тестов · LUMQERA CORE</span></div>
+        </div>
+      </section>
+
+      <section class="section" id="roadmap">
+        <div class="section-heading"><p class="kicker">05 / ПЛАН РАЗРАБОТКИ</p><h2>ПУТЬ К <span>ОТКРЫТИЮ</span></h2><p>Этапы без выдуманных дат и обещаний. Публиковать сроки будем после технических проверок.</p></div>
+        <div class="roadmap">
+          <article class="roadmap-item active"><span class="roadmap-index">01</span><div><strong>Фундамент проекта</strong><p>Сайт, кланы с ролями, PvP-статистика, клановые территории, войны, аванпосты, базы и PvP-тег. Проверка на Paper ещё впереди.</p></div><span class="roadmap-status">В РАБОТЕ</span></article>
+          <article class="roadmap-item"><span class="roadmap-index">02</span><div><strong>Тестовый игровой сервер</strong><p>Проверить защиту территорий, телепортацию и PvP-тег на настоящем Paper с несколькими игроками.</p></div><span class="roadmap-status">ПЛАН</span></article>
+          <article class="roadmap-item"><span class="roadmap-index">03</span><div><strong>Закрытый PvP-тест</strong><p>Баланс экономики, клановые механики, производительность, поиск уязвимостей.</p></div><span class="roadmap-status">ПЛАН</span></article>
+          <article class="roadmap-item"><span class="roadmap-index">04</span><div><strong>Публичный запуск</strong><p>Игровой сервер, сайт со статусом, правила, поддержка, система обновлений.</p></div><span class="roadmap-status">ПЛАН</span></article>
+        </div>
+      </section>
+
+      <section class="section faq-section" id="faq">
+        <div class="section-heading"><p class="kicker">06 / ВОПРОСЫ</p><h2>ЧАСТЫЕ <span>ВОПРОСЫ</span></h2></div>
+        <div class="faq-list">
+          <details><summary>Когда откроется LUMQERA?<span>+</span></summary><p>Дата открытия ещё не утверждена. Сначала подготовим рабочий сервер, проверим игровые механики и проведём тестирование.</p></details>
+          <details><summary>Можно ли уже зайти на сервер?<span>+</span></summary><p>Нет. Адрес игрового сервера и поддерживаемая версия появятся после настройки и тестов.</p></details>
+          <details><summary>Какая версия Minecraft потребуется?<span>+</span></summary><p>Мы ориентируемся на современную Minecraft Java Edition. Финальная версия клиента будет подтверждена после проверки совместимости плагинов.</p></details>
+          <details><summary>Будут ли донат и привилегии?<span>+</span></summary><p>Монетизация не входит в первый технический этап. Если появится магазин, его правила будут опубликованы отдельно, без продажи прямого преимущества в PvP.</p></details>
+        </div>
+      </section>
+      <section class="end-cta"><p class="kicker">LUMQERA / THE BEGINNING</p><h2>ЗАПОМНИ ЭТО <span>ИМЯ.</span></h2><p>Проект только начинается. Следите за подготовкой сервера и первыми тестами.</p><a class="button button-primary" href="#top">Вернуться наверх ↑</a></section>
+    </main>
+    <footer><a class="footer-brand" href="#top">LUMQERA <span>✦</span></a><p>Независимый Minecraft-проект. Не связан с Mojang или Microsoft.</p><span>© <span id="year">2026</span> LUMQERA</span></footer>
+  </div>
+</body>
+</html>
