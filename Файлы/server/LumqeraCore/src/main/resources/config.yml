@@ -1,0 +1,91 @@
+# LUMQERA Core v1.0.0-RC6 — перезапустите сервер после изменения конфигурации.
+clans:
+  max-members: 10
+  invite-timeout-seconds: 300
+  invite-cooldown-seconds: 10
+  friendly-fire: false
+pvp:
+  # Повторный килл того же игрока засчитывается только спустя 30 минут.
+  anti-farm-minutes: 30
+  clan-influence-per-kill: 3
+export:
+  # JSON для сайта обновляется автоматически, копируется на сайт отдельно.
+  interval-seconds: 60
+
+land:
+  # Только в перечисленных мирах. Названия чувствительны к регистру.
+  allowed-worlds: [world]
+  # Все приватные чанки имеют площадь 16x16 и распространяются на всю высоту.
+  max-chunks-per-clan: 12
+  # Безопасные зоны настраиваются командой /lumqera zone set <имя> <радиус>.
+  # В зоне запрещены строительство/взаимодействие (кроме bypass) и PvP.
+
+wars:
+  invite-seconds: 120
+  duration-minutes: 45
+  kills-to-win: 5
+outposts:
+  radius: 14
+  min-members: 2
+  capture-seconds: 45
+  reward-minutes: 10
+  influence-per-cycle: 5
+travel:
+  # Tag extends on each successful PvP hit. Blocks teleport and entry to safe-zones.
+  combat-tag-seconds: 20
+  # Standing still without taking damage is required to complete /spawn or /clan home.
+  warmup-seconds: 5
+  # Admin commands are not exempted by default, even for OPs.
+  admin-bypass-combat: false
+
+economy:
+  # Целочисленные игровые монеты, без дробных величин.
+  start-balance: 150
+  max-balance: 1000000000
+  max-transfer: 10000
+  pay-cooldown-seconds: 3
+  # Только засчитанные PvP-победы (с учётом существующего антифарма).
+  coins-per-credited-kill: 20
+
+# Белый список товаров. Покупается фиксированный набор за целое число монет.
+# Синтаксис: /shop list; /shop buy <товар> [кол-во наборов].
+shop:
+  max-bundles: 16
+  offers:
+    stone:
+      material: STONE
+      amount: 16
+      price: 20
+    logs:
+      material: OAK_LOG
+      amount: 16
+      price: 50
+    iron:
+      material: IRON_INGOT
+      amount: 8
+      price: 80
+    food:
+      material: COOKED_BEEF
+      amount: 16
+      price: 60
+    arrows:
+      material: ARROW
+      amount: 16
+      price: 30
+
+# Предупреждения НЕ вызывают автоблокировку. История доступна только OP или с разрешением staff.warn.
+staff:
+  max-warnings-per-player: 50
+
+# Прямой обмен предметами только рядом и вне PvP. Предметы остаются у владельцев до завершения.
+trade:
+  invite-seconds: 30
+  # Минимальное время между приглашениями, даже после отмены.
+  invite-cooldown-seconds: 5
+  session-seconds: 120
+  max-distance: 8
+
+# Закрытые обращения игроков. Никогда не публикуйте reports.yml и данные персонала на сайте.
+reports:
+  cooldown-seconds: 60
+  max-records: 2000

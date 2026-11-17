@@ -1,0 +1,114 @@
+name: LumqeraCore
+version: '1.0.0-RC6'
+main: ru.lumqera.core.LumqeraCore
+api-version: '26.3'
+author: LUMQERA
+website: https://lumqera.ru
+description: Core gameplay for LUMQERA - PvP, clans and protected land.
+commands:
+  clan:
+    description: Управление кланами
+    usage: /clan help
+    aliases: [clans]
+  pvpstats:
+    description: PvP-статистика игрока
+    usage: /pvpstats [ник]
+    aliases: [kills, mystats]
+  top:
+    description: Рейтинг PvP и кланов
+    usage: /top [pvp|clans]
+  claim:
+    description: Приватить текущий чанк для своего клана
+    usage: /claim
+  unclaim:
+    description: Снять приват с текущего чанка
+    usage: /unclaim
+  claims:
+    description: Посмотреть территорию своего клана
+    usage: /claims
+  spawn:
+    description: Teleport to the protected spawn after warmup
+    usage: /spawn
+  combat:
+    description: Show time left on the PvP tag
+    usage: /combat
+  war:
+    description: Вызовы на войну, рейтинги и счёт кланов
+    usage: /war help
+  outpost:
+    description: Контрольные PvP-точки
+    usage: /outpost list
+  balance:
+    description: Check your wallet balance
+    usage: /balance
+    aliases: [bal, money]
+  pay:
+    description: Transfer coins to an online player
+    usage: /pay <player> <amount>
+  eco:
+    description: Economy administration
+    usage: /eco give|take|set|balance
+  treasury:
+    description: Казна клана, взносы и вывод
+    usage: /treasury balance|deposit|withdraw
+  shop:
+    description: Покупка игровых предметов за монеты
+    usage: /shop list|buy
+  menu:
+    description: Графическое меню LUMQERA
+    usage: /menu [shop]
+  trade:
+    description: Безопасный обмен предметами между игроками онлайн
+    usage: /trade help
+  report:
+    description: Отправить персональную жалобу администрации
+    usage: /report <ник> <причина>
+  reports:
+    description: Закрытая очередь жалоб для персонала
+    usage: /reports list|show|claim|release|note|close
+  staff:
+    description: Предупреждения и журнал администрации
+    usage: /staff help
+  lumqera:
+    description: Информация о ядре LUMQERA и экспорт
+    usage: /lumqera help
+permissions:
+  lumqera.clan:
+    description: Разрешает использовать игровые клановые команды
+    default: true
+  lumqera.admin:
+    description: Административный экспорт рейтинга
+    default: op
+  lumqera.claim:
+    description: Разрешает клановые приваты
+    default: true
+  lumqera.land.bypass:
+    description: Обход защиты при строительстве (не действует на запрет PvP в зоне)
+    default: op
+  lumqera.spawn:
+    description: Use /spawn teleport
+    default: true
+  lumqera.economy.admin:
+    description: Allows account adjustments (logged to economy-audit.log)
+    default: op
+  lumqera.treasury:
+    description: Доступ участников к казне (вывод — глава и офицер)
+    default: true
+  lumqera.shop:
+    description: Доступ к магазину предметов
+    default: true
+  lumqera.menu:
+    description: Разрешает открывать игровые меню
+    default: true
+  lumqera.staff.warn:
+    description: Управление предупреждениями в warnings.yml
+    default: op
+  lumqera.report:
+    description: Разрешает игроку отправить жалобу
+    default: true
+  lumqera.staff.reports:
+    description: Доступ к закрытой очереди жалоб
+    default: op
+  lumqera.trade:
+    description: Разрешает обмен предметами через /trade
+    default: true
