@@ -1,0 +1,54 @@
+name: "Ошибка в LUMQERA"
+description: "Сообщить о баге игрового ядра, сайта или сборки"
+title: "[Ошибка] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за сообщение! Опишите проблему так, чтобы её можно было повторить.
+        Не публикуйте токены, конфиденциальные файлы и данные других игроков.
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Где возникла ошибка?"
+      options:
+        - "Игровое ядро LumqeraCore"
+        - "Сайт"
+        - "Сборка / запуск"
+        - "Другое"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "Версия проекта"
+      description: "Например, LumqeraCore 1.0.0-RC7 и Paper 26.3"
+      placeholder: "1.0.0-RC7"
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Что произошло?"
+      placeholder: "Кратко и по существу опишите ошибку"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Как воспроизвести?"
+      placeholder: |
+        1. Запустить ...
+        2. Выполнить ...
+        3. Получить ошибку ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Ожидаемый результат"
+      placeholder: "Как должно работать?"
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Лог ошибки (необязательно)"
+      description: "Уберите секреты и личные данные перед отправкой"
+      render: text

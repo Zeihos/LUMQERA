@@ -1,0 +1,41 @@
+name: "Идея для LUMQERA"
+description: "Предложить улучшение механик, интерфейса или сайта"
+title: "[Предложение] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Предложения рассматриваются по мере разработки.
+        Это не является обещанием добавить функцию в ближайший релиз.
+  - type: dropdown
+    id: area
+    attributes:
+      label: "К чему относится предложение?"
+      options:
+        - "PvP и баланс"
+        - "Кланы и территории"
+        - "Экономика и магазин"
+        - "Сайт и оформление"
+        - "Инструменты и разработка"
+        - "Другое"
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: "Что предлагаете?"
+      placeholder: "Опишите новую возможность или изменение"
+    validations:
+      required: true
+  - type: textarea
+    id: benefit
+    attributes:
+      label: "Зачем это нужно?"
+      description: "Какую проблему решит идея?"
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: "Примеры или дополнительные материалы"
+      description: "При необходимости добавьте ссылки, изображения или пояснения"
