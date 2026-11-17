@@ -35,6 +35,8 @@ final class ReportService {
             long next = data.getLong("next-id", -1);
             List<ReportRegistry.Ticket> tickets = new ArrayList<>();
             ConfigurationSection section = data.getConfigurationSection("reports");
+            if (section == null && data.contains("reports"))
+                throw new IllegalArgumentException("reports must be a YAML section");
             if (section != null) for (String idKey : section.getKeys(false)) {
                 String key = "reports." + idKey;
                 boolean closed = data.getBoolean(key + ".closed", false);
@@ -46,8 +48,12 @@ final class ReportService {
                         data.getString(key + ".closed-by", ""), data.getLong(key + ".closed-at", 0)));
             }
             Map<Long, ReportRegistry.Review> reviews = new HashMap<>();
+            if (schema == 1 && data.contains("reviews"))
+                throw new IllegalArgumentException("schema v1 must not contain reviews");
             if (schema == 2) {
                 ConfigurationSection section2 = data.getConfigurationSection("reviews");
+                if (section2 == null && data.contains("reviews"))
+                    throw new IllegalArgumentException("reviews must be a YAML section");
                 if (section2 != null) for (String key : section2.getKeys(false)) {
                     String path = "reviews." + key;
                     if (!data.isString(path + ".assigned-to") || !data.isSet(path + ".assigned-at") ||

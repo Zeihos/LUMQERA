@@ -1,7 +1,7 @@
 plugins { java }
 
 group = "ru.lumqera"
-version = "1.0.0-RC6"
+version = "1.0.0-RC7"
 
 repositories {
     mavenCentral()
@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.3.build.218-stable")
+    testImplementation("io.papermc.paper:paper-api:26.3.build.218-stable")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

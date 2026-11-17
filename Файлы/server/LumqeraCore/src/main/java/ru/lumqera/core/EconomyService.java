@@ -41,6 +41,12 @@ final class EconomyService {
         if (!Files.isRegularFile(ledgerFile)) return;
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(ledgerFile.toFile());
         ConfigurationSection section = yaml.getConfigurationSection("accounts");
+        // A corrupted scalar or list must never be treated as an empty wallet map.
+        if (section == null && yaml.contains("accounts")) {
+            healthy = false;
+            logger.severe("economy.yml accounts is not a YAML section. Economy locked; restore from backup.");
+            return;
+        }
         int version = yaml.getInt("schema-version", -1);
         if (version != 1 && version != 2) {
             healthy = false;
@@ -58,7 +64,10 @@ final class EconomyService {
                 long amount = n.longValue();
                 if (n.doubleValue() != (double) amount || amount < 0 || amount > ledger.limit())
                     throw new IllegalArgumentException("out of bounds");
-                accepted.put(id, amount);
+                // Java UUID parsing accepts some non-canonical forms: reject aliases
+                // and duplicates instead of silently overwriting an existing wallet.
+                if (!id.toString().equalsIgnoreCase(raw) || accepted.putIfAbsent(id, amount) != null)
+                    throw new IllegalArgumentException("duplicate or non-canonical UUID");
             } catch (IllegalArgumentException ex) {
                 healthy = false;
                 logger.severe("Invalid account in economy.yml: " + raw + ". Economy locked; restore from backup.");
@@ -67,6 +76,16 @@ final class EconomyService {
         }
         var vaults = new java.util.HashMap<String, Long>();
         ConfigurationSection treasurySection = yaml.getConfigurationSection("treasuries");
+        if (treasurySection == null && yaml.contains("treasuries")) {
+            healthy = false;
+            logger.severe("economy.yml treasuries is not a YAML section. Economy locked; restore from backup.");
+            return;
+        }
+        if (version == 1 && treasurySection != null) {
+            healthy = false;
+            logger.severe("economy.yml v1 unexpectedly contains treasuries; refusing to discard them.");
+            return;
+        }
         if (version == 2 && treasurySection != null) for (String raw : treasurySection.getKeys(false)) {
             try {
                 String key = EconomyRegistry.key(raw);

@@ -21,7 +21,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.*;
 
-/** LUMQERA v1.0.0-RC6: PvP, clans, GUI shop and trades. */
+/** LUMQERA v1.0.0-RC7: PvP, clans, GUI shop and trades. */
 public final class LumqeraCore extends JavaPlugin implements CommandExecutor, TabCompleter, Listener {
     private static final String PREFIX = "§5§lLUMQERA §8» §r";
     private ClansService clans;
@@ -179,7 +179,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
         long ticks = Math.max(20L, getConfig().getLong("export.interval-seconds", 60L) * 20L);
         Bukkit.getScheduler().runTaskTimer(this, exporter::export, ticks, ticks);
         startupComplete = true;
-        getLogger().info("LUMQERA Core v1.0.0-RC6 started with " + clans.all().size() + " clans and " + land.state().allClaims().size() + " claims");
+        getLogger().info("LUMQERA Core v1.0.0-RC7 started with " + clans.all().size() + " clans and " + land.state().allClaims().size() + " claims");
         } catch (RuntimeException ex) {
             startupComplete = false;
             getLogger().severe("STARTUP FAILED: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
