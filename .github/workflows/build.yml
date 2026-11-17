@@ -1,0 +1,70 @@
+name: LumqeraCore - Paper build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Файлы/server/LumqeraCore/**'
+      - 'Файлы/build-plugin-windows.bat'
+      - '.github/workflows/build.yml'
+  pull_request:
+    paths:
+      - 'Файлы/server/LumqeraCore/**'
+      - 'Файлы/build-plugin-windows.bat'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: JDK 25 / Gradle 9.1.0 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v5
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Set up Gradle 9.1.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.1.0'
+      # On Windows, Gradle's JUnit worker may not load classes from a Cyrillic
+      # workspace path. Copy the *same sources* to a temporary ASCII-only path.
+      - name: Stage Windows sources in ASCII path
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Copy-Item -LiteralPath 'Файлы/server/LumqeraCore' -Destination (Join-Path $env:RUNNER_TEMP 'LumqeraCore') -Recurse
+      - name: Compile and test plugin (Linux)
+        if: runner.os != 'Windows'
+        working-directory: Файлы/server/LumqeraCore
+        run: gradle clean build --no-daemon --console plain --stacktrace
+      - name: Compile and test plugin (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ${{ runner.temp }}/LumqeraCore
+        run: gradle clean build --no-daemon --console plain --stacktrace
+      - name: Publish test diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LumqeraCore-test-diagnostics-${{ matrix.os }}-${{ github.run_number }}
+          path: |
+            Файлы/server/LumqeraCore/build/test-results/
+            ${{ runner.temp }}/LumqeraCore/build/test-results/
+          if-no-files-found: warn
+      - name: Publish compiled plugin JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: LumqeraCore-${{ matrix.os }}-${{ github.run_number }}
+          path: |
+            Файлы/server/LumqeraCore/build/libs/*.jar
+            ${{ runner.temp }}/LumqeraCore/build/libs/*.jar
+          if-no-files-found: error
