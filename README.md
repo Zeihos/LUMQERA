@@ -13,7 +13,7 @@
   <a href="https://github.com/Zeihos/LUMQERA/actions/workflows/build.yml"><img alt="Проверка сборки" src="https://github.com/Zeihos/LUMQERA/actions/workflows/build.yml/badge.svg?branch=main"></a>
   <img alt="Java 25" src="https://img.shields.io/badge/Java-25-7855D8?style=flat-square">
   <img alt="Paper 26.3" src="https://img.shields.io/badge/Paper-26.3-7855D8?style=flat-square">
-  <img alt="LumqeraCore RC7" src="https://img.shields.io/badge/LumqeraCore-1.0.0--RC7-7855D8?style=flat-square">
+  <img alt="LumqeraCore RC8" src="https://img.shields.io/badge/LumqeraCore-1.0.0--RC8-7855D8?style=flat-square">
 </p>
 
 <p align="center">
@@ -32,7 +32,7 @@
 Проект включает собственный игровой плагин **LumqeraCore** и веб-сайт. Мы не выдаём незавершённые механики за готовый релиз: код ядра собирается в GitHub Actions, но полноценная проверка всех систем в работающем Minecraft-сервере ещё впереди.
 
 > [!IMPORTANT]
-> **Статус: разработка · RC7.** Публичный запуск сервера, адрес для подключения и дата релиза пока не объявлены. Исходники в этом репозитории — не обещание доступного игрового сервера.
+> **Статус: разработка · RC8.** Публичный запуск сервера, адрес для подключения и дата релиза пока не объявлены. Исходники в этом репозитории — не обещание доступного игрового сервера.
 
 ## Возможности
 
@@ -101,7 +101,7 @@ gradle clean build --no-daemon
 После успешной сборки появится:
 
 ```text
-server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC7.jar
+server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC8.jar
 ```
 
 **Без локальной сборки:** перейдите в [GitHub Actions](https://github.com/Zeihos/LUMQERA/actions/workflows/build.yml), откройте успешный запуск и скачайте JAR из блока **Artifacts**.
@@ -144,6 +144,10 @@ LUMQERA/
 
 Исходники и серверные данные разделены: **игровые миры, журналы, данные игроков и собранные JAR не должны попадать в публичные коммиты**.
 
+## История обновлений
+
+Что меняется между версиями и как развиваются механики — в [CHANGELOG.md](CHANGELOG.md).
+
 ## Этапы разработки
 
 - [x] Базовые системы кланов, PvP, экономики и территорий реализованы в коде
@@ -168,5 +172,5 @@ LUMQERA/
 <p align="center">
   <img src="assets/branding/logo.png" width="72" alt="Логотип LUMQERA"><br>
   <b>LUMQERA</b> · Minecraft PvP &amp; Clans<br>
-  <sub>Разработка продолжается · LumqeraCore 1.0.0-RC7</sub>
+  <sub>Разработка продолжается · LumqeraCore 1.0.0-RC8</sub>
 </p>
