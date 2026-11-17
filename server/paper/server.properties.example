@@ -1,0 +1,8 @@
+# Example only. Copy to server.properties and edit for your own server.
+# Paper will generate server.properties automatically on first launch.
+motd=LUMQERA | PvP & Clans
+server-port=25565
+online-mode=true
+white-list=true
+max-players=20
+enable-command-block=false

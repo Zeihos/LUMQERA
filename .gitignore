@@ -1,22 +1,28 @@
-# Build output and local tooling
+# Java / Gradle
+.gradle/
 **/.gradle/
 **/build/
 **/out/
-**/*.class
-**/.idea/
-**/.vscode/
-**/*.log
-**/*.tmp
-**/gradle-*.zip
+*.class
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
 
-# Never add locally generated Paper server state to new commits
-Файлы/server/paper/logs/
-Файлы/server/paper/world/
-Файлы/server/paper/world_nether/
-Файлы/server/paper/world_the_end/
-Файлы/server/paper/plugins/
-Файлы/server/paper/eula.txt
-Файлы/server/paper/ops.json
-Файлы/server/paper/whitelist.json
-Файлы/server/paper/usercache.json
-**/session.lock
+# IDE / OS / temporary files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*.zip
+backups/
+
+# Generated Paper worlds, secrets, player data, and runtime files.
+# Keep only the documented example configuration in the repository.
+server/paper/**
+!server/paper/
+!server/paper/server.properties.example
+
+# Local exported website rankings are generated from game data;
+# website/data/public-stats.json is deliberately a tracked sample.
