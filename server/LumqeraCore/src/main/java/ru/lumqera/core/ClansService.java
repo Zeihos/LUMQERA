@@ -50,11 +50,15 @@ final class ClansService {
         return null;
     }
     boolean invite(ClanRegistry.Clan clan, UUID actor, UUID target, long ttlMs, long cooldownMs, long now) {
-        if (clan == null || !clan.isOfficerOrOwner(actor) || of(target) != null) return false;
+        if (clan == null || actor == null || target == null || now < 0 || ttlMs <= 0 || cooldownMs < 0
+                || registry.byName(clan.name) != clan || !clan.isOfficerOrOwner(actor) || of(target) != null) return false;
         Long last = lastInvitedBy.get(actor);
         if (last != null && now >= last && now - last < cooldownMs) return false;
         lastInvitedBy.put(actor, now);
-        invitations.put(target, new Invitation(ClanRegistry.key(clan.name), now + Math.max(1000L, ttlMs)));
+        long duration = Math.max(1000L, ttlMs);
+        // A misconfigured huge TTL must not wrap into a negative expiry.
+        long expiresAt = now > Long.MAX_VALUE - duration ? Long.MAX_VALUE : now + duration;
+        invitations.put(target, new Invitation(ClanRegistry.key(clan.name), expiresAt));
         return true;
     }
     ClanRegistry.Clan accept(UUID player, int maxMembers, long now) {
@@ -74,7 +78,9 @@ final class ClansService {
                 String value = yaml.getString("players." + id);
                 if (value == null || !value.matches("[A-Za-z0-9_]{3,16}"))
                     throw new IllegalStateException("Invalid saved player nickname for " + id);
-                names.put(UUID.fromString(id), value);
+                UUID playerId = canonicalUuid(id);
+                if (names.putIfAbsent(playerId, value) != null)
+                    throw new IllegalStateException("Duplicate saved nickname UUID: " + id);
             } catch (IllegalArgumentException ex) { throw new IllegalStateException("Invalid stored player name ID: " + id, ex); }
         }
         ConfigurationSection section = yaml.getConfigurationSection("clans");
@@ -85,12 +91,24 @@ final class ClansService {
         for (String name : section.getKeys(false)) {
             try {
                 String prefix = "clans." + name;
-                UUID owner = UUID.fromString(yaml.getString(prefix + ".owner", ""));
-                List<UUID> members = parseUUIDs(yaml.getStringList(prefix + ".members"));
-                List<UUID> officers = parseUUIDs(yaml.getStringList(prefix + ".officers"));
-                int influence = yaml.getInt(prefix + ".influence", 0);
+                Object storedOwner = yaml.get(prefix + ".owner");
+                if (!(storedOwner instanceof String ownerId))
+                    throw new IllegalStateException("Missing/invalid clan owner: " + name);
+                UUID owner = canonicalUuid(ownerId);
+                // getStringList() silently drops invalid elements and converts a wrong type to [].
+                // Never turn a corrupted membership or officer list into an apparently valid clan.
+                List<UUID> members = parseUUIDs(yaml.get(prefix + ".members"), name + ".members");
+                List<UUID> officers = parseUUIDs(yaml.get(prefix + ".officers"), name + ".officers");
+                Object rawInfluence = yaml.get(prefix + ".influence");
+                if (!(rawInfluence instanceof Integer || rawInfluence instanceof Long))
+                    throw new IllegalStateException("Invalid clan influence type: " + name);
+                long count = ((Number) rawInfluence).longValue();
+                if (count < 0 || count > Integer.MAX_VALUE)
+                    throw new IllegalStateException("Clan influence outside valid range: " + name);
+                int influence = (int) count;
                 if (!ClanRegistry.validName(name) || !members.contains(owner) ||
                     members.size() != new HashSet<>(members).size() ||
+                    officers.size() != new HashSet<>(officers).size() ||
                     !members.containsAll(officers) || officers.contains(owner) || influence < 0 ||
                     members.stream().anyMatch(id -> registry.of(id) != null)) {
                     throw new IllegalStateException("Invalid clan membership or influence: " + name);
@@ -102,11 +120,24 @@ final class ClansService {
             }
         }
     }
-    private List<UUID> parseUUIDs(List<String> strings) {
+    /** Reject malformed/shortened Java UUID aliases and types that Bukkit otherwise coerces. */
+    private static UUID canonicalUuid(String text) {
+        if (text == null || !text.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
+            throw new IllegalArgumentException("Invalid UUID: " + text);
+        UUID id = UUID.fromString(text);
+        if (!id.toString().equalsIgnoreCase(text))
+            throw new IllegalArgumentException("Non-canonical UUID: " + text);
+        return id;
+    }
+
+    private static List<UUID> parseUUIDs(Object raw, String field) {
+        if (!(raw instanceof List<?> stored))
+            throw new IllegalStateException("Missing or invalid YAML list: " + field);
         List<UUID> result = new ArrayList<>();
-        for (String input : strings) {
-            try { result.add(UUID.fromString(input)); }
-            catch (IllegalArgumentException ex) { throw new IllegalStateException("Invalid clan member UUID: " + input, ex); }
+        for (Object item : stored) {
+            if (!(item instanceof String value))
+                throw new IllegalStateException("Non-string clan member or officer in " + field);
+            result.add(canonicalUuid(value));
         }
         return result;
     }
