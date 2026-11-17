@@ -16,15 +16,6 @@ if (toggle && nav) {
 }
 const year = document.querySelector('#year');
 if (year) year.textContent = String(new Date().getFullYear());
-// В скриншоте VK нет ссылки сообщества. Не подменяем неизвестный адрес выдуманным.
-const community = document.querySelector('[data-vk-placeholder]');
-if (community) {
-  community.addEventListener('click', e => {
-    e.preventDefault();
-    alert('Ссылка на сообщество LUMQERA будет добавлена после уточнения точного адреса.');
-  });
-}
-
 // Read-only ranking UI. Data is produced by LumqeraCore and manually synchronized to /data.
 const ratingResults = document.querySelector('#rating-results');
 if (ratingResults) {
