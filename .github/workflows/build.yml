@@ -39,7 +39,16 @@ jobs:
           gradle-version: '9.1.0'
       - name: Compile and test plugin
         working-directory: Файлы/server/LumqeraCore
-        run: gradle clean build --no-daemon --console plain
+        run: gradle clean build --no-daemon --console plain --stacktrace --info
+      - name: Publish test diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LumqeraCore-test-diagnostics-${{ matrix.os }}-${{ github.run_number }}
+          path: |
+            Файлы/server/LumqeraCore/build/test-results/
+            Файлы/server/LumqeraCore/build/reports/tests/
+          if-no-files-found: warn
       - name: Publish compiled plugin JAR
         uses: actions/upload-artifact@v4
         with:
