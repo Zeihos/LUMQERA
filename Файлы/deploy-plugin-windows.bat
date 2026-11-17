@@ -4,7 +4,7 @@ chcp 65001 >nul
 title LUMQERA - Deploy LumqeraCore
 cd /d "%~dp0"
 echo [IMPORTANT] Stop the Paper server completely before deploying.
-set "SOURCE=server\LumqeraCore\build\libs\LumqeraCore-1.0.0-RC6.jar"
+set "SOURCE=server\LumqeraCore\build\libs\LumqeraCore-1.0.0-RC7.jar"
 set "DEST=server\paper\plugins"
 if not exist "%SOURCE%" (
   echo [ERROR] Built plugin JAR not found: %SOURCE%
