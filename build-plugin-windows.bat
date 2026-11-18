@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 chcp 65001 >nul
-title LUMQERA - Build LumqeraCore RC8
+title LUMQERA - Build LumqeraCore RC9
 cd /d "%~dp0"
 set "ROOT=%CD%"
 set "PROJECT=%ROOT%\server\LumqeraCore"
@@ -10,9 +10,9 @@ set "JDK_HOME="
 set "GRADLE_CMD="
 set "GRADLE_VERSION=9.1.0"
 
-> "%LOG%" echo LUMQERA RC8 build diagnostics
+> "%LOG%" echo LUMQERA RC9 build diagnostics
 >> "%LOG%" echo Project: %PROJECT%
-echo [LUMQERA] Build LumqeraCore 1.0.0-RC8
+echo [LUMQERA] Build LumqeraCore 1.0.0-RC9
 echo [INFO] Log: "%LOG%"
 if not exist "%PROJECT%\build.gradle.kts" goto no_source
 if not exist "%PROJECT%\src\main\resources\plugin.yml" goto no_source
@@ -73,7 +73,7 @@ echo [INFO] Assembling LumqeraCore JAR. Full tests run in GitHub Actions.
 call "%GRADLE_CMD%" clean assemble --no-daemon --console=plain --stacktrace >> "%LOG%" 2>&1
 set "BUILD_EXIT=%ERRORLEVEL%"
 if not "%BUILD_EXIT%"=="0" goto build_failed
-set "OUTPUT=%PROJECT%\build\libs\LumqeraCore-1.0.0-RC8.jar"
+set "OUTPUT=%PROJECT%\build\libs\LumqeraCore-1.0.0-RC9.jar"
 if not exist "%OUTPUT%" goto jar_missing
 popd
 echo.
@@ -121,7 +121,7 @@ echo [HINT] The last log entries follow:
 powershell.exe -NoProfile -Command "Get-Content -LiteralPath '%LOG%' -Tail 40"
 goto failure
 :jar_missing
-echo [ERROR] Gradle succeeded but LumqeraCore-1.0.0-RC8.jar was not found.
+echo [ERROR] Gradle succeeded but LumqeraCore-1.0.0-RC9.jar was not found.
 echo [CHECK] "%PROJECT%\build\libs"
 if exist "%PROJECT%\build\libs" dir /b "%PROJECT%\build\libs"
 goto failure
