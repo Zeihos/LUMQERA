@@ -4,7 +4,7 @@ import java.util.*;
 
 /** Pure logic for PvP counters; names and UUIDs are kept separate. */
 final class CombatRegistry {
-    enum Result { DEATH_ONLY, CREDITED, FARM_BLOCKED }
+    enum Result { DEATH_ONLY, CREDITED, FARM_BLOCKED, PERSISTENCE_FAILED }
     static final class Stats {
         int kills;
         int deaths;
@@ -25,16 +25,24 @@ final class CombatRegistry {
         return Collections.unmodifiableMap(recentPairs);
     }
     Result recordDeath(UUID victim, UUID killer, boolean allies, long now, long cooldownMs) {
-        data.computeIfAbsent(victim, ignored -> new Stats(0, 0)).deaths++;
+        Stats victimStats = data.computeIfAbsent(victim, ignored -> new Stats(0, 0));
+        victimStats.deaths = saturatingIncrement(victimStats.deaths);
         if (killer == null || killer.equals(victim) || allies) return Result.DEATH_ONLY;
         String pair = killer + ":" + victim;
         Long last = recentPairs.get(pair);
-        if (last != null && (now < last || now - last < Math.max(0, cooldownMs))) return Result.FARM_BLOCKED;
-        recentPairs.put(pair, now);
-        data.computeIfAbsent(killer, ignored -> new Stats(0, 0)).kills++;
+        if (cooldownMs > 0 && last != null && (now < last || now - last < cooldownMs))
+            return Result.FARM_BLOCKED;
+        if (cooldownMs > 0) recentPairs.put(pair, now);
+        Stats killerStats = data.computeIfAbsent(killer, ignored -> new Stats(0, 0));
+        killerStats.kills = saturatingIncrement(killerStats.kills);
         return Result.CREDITED;
     }
+    private static int saturatingIncrement(int current) {
+        return current >= Integer.MAX_VALUE ? Integer.MAX_VALUE : current + 1;
+    }
     void prune(long now, long cooldownMs) {
-        recentPairs.entrySet().removeIf(e -> e.getValue() > now || now - e.getValue() >= Math.max(0, cooldownMs));
+        // A clock rollback must not delete saved anti-farming protection.
+        recentPairs.entrySet().removeIf(e -> e.getValue() <= now
+                && now - e.getValue() >= Math.max(0, cooldownMs));
     }
 }

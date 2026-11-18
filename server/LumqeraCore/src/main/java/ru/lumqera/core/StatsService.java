@@ -21,7 +21,12 @@ final class StatsService {
     CombatRegistry.Stats of(UUID id) { return registry.get(id); }
     CombatRegistry.Result recordDeath(UUID victim, UUID killer, boolean allies) {
         CombatRegistry.Result result = registry.recordDeath(victim, killer, allies, System.currentTimeMillis(), farmCooldownMs);
-        save(); return result;
+        // Never grant coins/influence for an unpersisted PvP win.
+        if (!save()) {
+            logger.severe("PvP statistics could not be persisted; reward credit is blocked.");
+            return CombatRegistry.Result.PERSISTENCE_FAILED;
+        }
+        return result;
     }
     /** Fail-closed: a malformed record must not be silently discarded and overwritten. */
     void load() {
@@ -30,11 +35,16 @@ final class StatsService {
         ConfigurationSection people = yaml.getConfigurationSection("players");
         if (people == null && yaml.contains("players"))
             throw new IllegalStateException("pvp.yml: players must be a section");
+        Set<UUID> knownPlayers = new HashSet<>();
         if (people != null) for (String id : people.getKeys(false)) {
             try {
-                UUID uuid = UUID.fromString(id);
-                int kills = nonNegativeInt(yaml.get("players." + id + ".kills"), "kills");
-                int deaths = nonNegativeInt(yaml.get("players." + id + ".deaths"), "deaths");
+                UUID uuid = canonicalUuid(id);
+                if (!knownPlayers.add(uuid))
+                    throw new IllegalArgumentException("duplicate player UUID");
+                ConfigurationSection player = people.getConfigurationSection(id);
+                if (player == null) throw new IllegalArgumentException("player must be a YAML section");
+                int kills = nonNegativeInt(player.get("kills"), "kills");
+                int deaths = nonNegativeInt(player.get("deaths"), "deaths");
                 registry.restore(uuid, kills, deaths);
             } catch (IllegalArgumentException exception) {
                 throw new IllegalStateException("pvp.yml: invalid player record " + id, exception);
@@ -46,25 +56,35 @@ final class StatsService {
         if (pairs != null) for (String encoded : pairs.getKeys(false)) {
             try {
                 String key = new String(Base64.getUrlDecoder().decode(encoded), java.nio.charset.StandardCharsets.UTF_8);
+                String canonicalEncoded = Base64.getUrlEncoder().withoutPadding().encodeToString(
+                        key.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                if (!canonicalEncoded.equals(encoded)) throw new IllegalArgumentException("non-canonical encoded pair");
                 String[] uuids = key.split(":", -1);
-                if (uuids.length != 2 || !UUID.fromString(uuids[0]).toString().equals(uuids[0]) ||
-                        !UUID.fromString(uuids[1]).toString().equals(uuids[1]))
+                if (uuids.length != 2 || !canonicalUuid(uuids[0]).toString().equals(uuids[0]) ||
+                        !canonicalUuid(uuids[1]).toString().equals(uuids[1]))
                     throw new IllegalArgumentException("invalid UUID pair");
-                Object raw = yaml.get("recent-pairs." + encoded);
-                if (!(raw instanceof Number n) || n.longValue() <= 0 ||
-                        n.doubleValue() != (double)n.longValue())
+                Object raw = pairs.get(encoded);
+                if (!(raw instanceof Integer || raw instanceof Long) || ((Number) raw).longValue() <= 0)
                     throw new IllegalArgumentException("invalid pair timestamp");
-                registry.restoreRecentPair(key, n.longValue());
+                registry.restoreRecentPair(key, ((Number) raw).longValue());
             } catch (IllegalArgumentException exception) {
                 throw new IllegalStateException("pvp.yml: invalid recent-pair record " + encoded, exception);
             }
         }
     }
+    private static UUID canonicalUuid(String text) {
+        if (text == null || !text.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
+            throw new IllegalArgumentException("invalid player UUID");
+        UUID parsed = UUID.fromString(text);
+        if (!parsed.toString().equalsIgnoreCase(text))
+            throw new IllegalArgumentException("non-canonical UUID");
+        return parsed;
+    }
     private static int nonNegativeInt(Object raw, String field) {
-        if (!(raw instanceof Number number) || number.doubleValue() != (double)number.longValue()
-                || number.longValue() < 0 || number.longValue() > Integer.MAX_VALUE)
+        if (!(raw instanceof Integer || raw instanceof Long) || ((Number) raw).longValue() < 0
+                || ((Number) raw).longValue() > Integer.MAX_VALUE)
             throw new IllegalArgumentException("invalid " + field);
-        return number.intValue();
+        return ((Number) raw).intValue();
     }
     boolean save() {
         YamlConfiguration yaml = new YamlConfiguration();
