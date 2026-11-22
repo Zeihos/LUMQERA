@@ -21,7 +21,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.*;
 
-/** LUMQERA v1.0.0-RC11: PvP, clans, GUI shop and trades. */
+/** LUMQERA v1.0.0-RC12: PvP, clans, GUI shop and trades. */
 public final class LumqeraCore extends JavaPlugin implements CommandExecutor, TabCompleter, Listener {
     private static final String PREFIX = "§5§lLUMQERA §8» §r";
     private ClansService clans;
@@ -179,7 +179,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
         long ticks = Math.max(20L, getConfig().getLong("export.interval-seconds", 60L) * 20L);
         Bukkit.getScheduler().runTaskTimer(this, exporter::export, ticks, ticks);
         startupComplete = true;
-        getLogger().info("LUMQERA Core v1.0.0-RC11 started with " + clans.all().size() + " clans and " + land.state().allClaims().size() + " claims");
+        getLogger().info("LUMQERA Core v1.0.0-RC12 started with " + clans.all().size() + " clans and " + land.state().allClaims().size() + " claims");
         } catch (RuntimeException ex) {
             startupComplete = false;
             getLogger().severe("STARTUP FAILED: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
@@ -413,7 +413,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
 
     private boolean adminCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-            send(sender, "§dLumqeraCore §fv1.0.0-RC11 §7| Кланов: §f" + clans.all().size() + " §7| Чанков: §f" + land.state().allClaims().size());
+            send(sender, "§dLumqeraCore §fv1.0.0-RC12 §7| Кланов: §f" + clans.all().size() + " §7| Чанков: §f" + land.state().allClaims().size());
             send(sender, "§7Игроки: §f/claim, /unclaim, /claims, /top clans, /top pvp, /balance, /pay");
             if (sender.hasPermission("lumqera.admin")) {
                 send(sender, "§d/lumqera status §7— диагностика состояния игрового ядра");
@@ -431,7 +431,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
         }
         if (!sender.hasPermission("lumqera.admin")) { send(sender, "§cНедостаточно прав."); return true; }
         if (args[0].equalsIgnoreCase("status")) {
-            send(sender, "§dLUMQERA §fv1.0.0-RC11 §7| Paper: §f" + Bukkit.getBukkitVersion());
+            send(sender, "§dLUMQERA §fv1.0.0-RC12 §7| Paper: §f" + Bukkit.getBukkitVersion());
             send(sender, "§7Онлайн: §f" + Bukkit.getOnlinePlayers().size() + "§7 | Кланы: §f" + clans.all().size()
                     + "§7 | Чанки: §f" + land.state().allClaims().size()
                     + "§7 | Аванпосты: §f" + outposts.state().all().size());

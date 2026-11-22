@@ -13,12 +13,13 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.List;
@@ -53,12 +54,21 @@ final class LandProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent e) {
         if ((e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.PHYSICAL) || e.getClickedBlock() == null) return;
-        if (e.getHand() != null && e.getHand() != EquipmentSlot.HAND) return;
+        // Bukkit fires a separate interaction for the off hand; both hands must be checked.
         if (disallowed(e.getPlayer(), e.getClickedBlock().getLocation())) e.setCancelled(true);
     }
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInteractEntity(PlayerInteractEntityEvent e) {
         if (disallowed(e.getPlayer(), e.getRightClicked().getLocation())) e.setCancelled(true);
+    }
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityPlace(EntityPlaceEvent e) {
+        Player placer = e.getPlayer();
+        Location target = e.getEntity().getLocation();
+        if (placer == null) {
+            // Unknown automated source: never place vehicles/decorations in protected land.
+            if (land.protectedAt(target)) e.setCancelled(true);
+        } else if (disallowed(placer, target)) e.setCancelled(true);
     }
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onArmorStand(PlayerArmorStandManipulateEvent e) {
@@ -86,9 +96,13 @@ final class LandProtectionListener implements Listener {
         Player attacker = actor(e.getDamager());
         boolean safeVictim = land.zone(e.getEntity().getLocation()) != null;
         boolean safeAttacker = attacker != null && land.zone(attacker.getLocation()) != null;
-        if (safeVictim || safeAttacker) { e.setCancelled(true); return; }
-        if (attacker != null && !(e.getEntity() instanceof Player)
-                && !land.canModify(attacker, e.getEntity().getLocation())) e.setCancelled(true);
+        // Unknown or indirect attackers (TNT, summoned projectiles etc.) must not
+        // damage protected animals, item frames, armor stands or other entities.
+        boolean protectedVictim = land.protectedAt(e.getEntity().getLocation());
+        boolean permitted = attacker != null && (!protectedVictim
+                || land.canModify(attacker, e.getEntity().getLocation()));
+        if (LandProtectionRules.denyEntityDamage(safeVictim, safeAttacker,
+                e.getEntity() instanceof Player, protectedVictim, permitted)) e.setCancelled(true);
     }
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPickup(EntityPickupItemEvent e) {
@@ -99,8 +113,19 @@ final class LandProtectionListener implements Listener {
     public void onHopperTransfer(InventoryMoveItemEvent e) {
         Location from = e.getSource().getLocation();
         Location to = e.getDestination().getLocation();
-        if (from != null && to != null && !Objects.equals(land.label(from), land.label(to))
-                && (land.protectedAt(from) || land.protectedAt(to))) e.setCancelled(true);
+        if (from != null && to != null &&
+                LandProtectionRules.denyCrossRegionTransfer(land.label(from), land.label(to),
+                        land.protectedAt(from), land.protectedAt(to))) e.setCancelled(true);
+    }
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onHopperPickup(InventoryPickupItemEvent e) {
+        Location droppedAt = e.getItem().getLocation();
+        Location hopperAt = e.getInventory().getLocation();
+        if (!land.protectedAt(droppedAt)) return;
+        // A hopper outside the claim must not steal dropped items from protected land.
+        String hopperRegion = hopperAt == null ? null : land.label(hopperAt);
+        if (LandProtectionRules.denyExternalPickup(land.label(droppedAt), hopperRegion, true))
+            e.setCancelled(true);
     }
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onFertilize(BlockFertilizeEvent e) {
