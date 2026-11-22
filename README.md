@@ -13,7 +13,7 @@
   <a href="https://github.com/Zeihos/LUMQERA/actions/workflows/build.yml"><img alt="Проверка сборки" src="https://github.com/Zeihos/LUMQERA/actions/workflows/build.yml/badge.svg?branch=main"></a>
   <img alt="Java 25" src="https://img.shields.io/badge/Java-25-7855D8?style=flat-square">
   <img alt="Paper 26.3" src="https://img.shields.io/badge/Paper-26.3-7855D8?style=flat-square">
-  <img alt="LumqeraCore RC12" src="https://img.shields.io/badge/LumqeraCore-1.0.0--RC12-7855D8?style=flat-square">
+  <img alt="LumqeraCore RC13" src="https://img.shields.io/badge/LumqeraCore-1.0.0--RC13-7855D8?style=flat-square">
 </p>
 
 <p align="center">
@@ -32,7 +32,7 @@
 Проект включает собственный игровой плагин **LumqeraCore** и веб-сайт. Мы не выдаём незавершённые механики за готовый релиз: код ядра собирается в GitHub Actions, но полноценная проверка всех систем в работающем Minecraft-сервере ещё впереди.
 
 > [!IMPORTANT]
-> **Статус: разработка · RC12.** Публичный запуск сервера, адрес для подключения и дата релиза пока не объявлены. Исходники в этом репозитории — не обещание доступного игрового сервера.
+> **Статус: разработка · RC13.** Публичный запуск сервера, адрес для подключения и дата релиза пока не объявлены. Исходники в этом репозитории — не обещание доступного игрового сервера.
 
 ## Возможности
 
@@ -101,7 +101,7 @@ gradle clean build --no-daemon
 После успешной сборки появится:
 
 ```text
-server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC12.jar
+server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC13.jar
 ```
 
 **Без локальной сборки:** перейдите в [GitHub Actions](https://github.com/Zeihos/LUMQERA/actions/workflows/build.yml), откройте успешный запуск и скачайте JAR из блока **Artifacts**.
@@ -150,7 +150,9 @@ LUMQERA/
 
 ## Закрытое тестирование
 
-Для проверки защиты построек с несколькими игроками подготовлен [чек-лист RC12](docs/TESTING-RC12.md): PvP, поршни, жидкости, воронки, взрывы, взаимодействия со второй рукой и сохранения после перезапуска.
+Для защиты построек используйте [чек-лист RC12](docs/TESTING-RC12.md): PvP, поршни, жидкости, воронки и взрывы. Для новой системы надёжности кланов — [тест-план RC13](docs/TESTING-RC13.md).
+
+**Сохранность данных RC13:** операции кланов подтверждаются только после сохранения. Испытания на работающем Paper и проверка сценариев роспуска с другими системами ещё обязательны. [История изменений](CHANGELOG.md).
 
 ## Этапы разработки
 
@@ -176,5 +178,5 @@ LUMQERA/
 <p align="center">
   <img src="assets/branding/logo.png" width="72" alt="Логотип LUMQERA"><br>
   <b>LUMQERA</b> · Minecraft PvP &amp; Clans<br>
-  <sub>Разработка продолжается · LumqeraCore 1.0.0-RC12</sub>
+  <sub>Разработка продолжается · LumqeraCore 1.0.0-RC13</sub>
 </p>

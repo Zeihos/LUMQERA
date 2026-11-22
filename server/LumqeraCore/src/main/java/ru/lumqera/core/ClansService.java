@@ -22,26 +22,62 @@ final class ClansService {
     ClanRegistry.Clan of(UUID id) { return registry.of(id); }
     ClanRegistry.Clan byName(String name) { return registry.byName(name); }
     boolean sameClan(UUID a, UUID b) { return registry.sameClan(a, b); }
-    boolean create(String name, UUID owner) { boolean ok = registry.create(name, owner); if (ok) save(); return ok; }
-    boolean remove(ClanRegistry.Clan clan, UUID player) { boolean ok = registry.removeMember(clan, player); if (ok) save(); return ok; }
-    boolean promote(ClanRegistry.Clan clan, UUID actor, UUID target) { boolean ok = registry.promote(clan, actor, target); if (ok) save(); return ok; }
-    boolean demote(ClanRegistry.Clan clan, UUID actor, UUID target) { boolean ok = registry.demote(clan, actor, target); if (ok) save(); return ok; }
-    boolean transfer(ClanRegistry.Clan clan, UUID actor, UUID target) { boolean ok = registry.transfer(clan, actor, target); if (ok) save(); return ok; }
-    void reward(UUID player, int points) { registry.addInfluence(player, points); save(); }
+    private boolean commit(java.util.function.BooleanSupplier operation, String description) {
+        ClanRegistry.Snapshot before = registry.snapshot();
+        if (!operation.getAsBoolean()) return false;
+        if (save()) return true;
+        registry.restore(before);
+        logger.severe("CLANS " + description + " was rolled back: clans.yml could not be saved");
+        return false;
+    }
+    boolean create(String name, UUID owner) {
+        return commit(() -> registry.create(name, owner), "create");
+    }
+    boolean remove(ClanRegistry.Clan clan, UUID player) {
+        return commit(() -> registry.removeMember(clan, player), "leave/kick");
+    }
+    boolean promote(ClanRegistry.Clan clan, UUID actor, UUID target) {
+        return commit(() -> registry.promote(clan, actor, target), "promote");
+    }
+    boolean demote(ClanRegistry.Clan clan, UUID actor, UUID target) {
+        return commit(() -> registry.demote(clan, actor, target), "demote");
+    }
+    boolean transfer(ClanRegistry.Clan clan, UUID actor, UUID target) {
+        return commit(() -> registry.transfer(clan, actor, target), "transfer");
+    }
+    boolean reward(UUID player, int points) {
+        if (points <= 0 || of(player) == null) return false;
+        return commit(() -> {
+            ClanRegistry.Clan clan = of(player);
+            int old = clan.influence;
+            registry.addInfluence(player, points);
+            return clan.influence != old;
+        }, "reward");
+    }
     boolean rewardClan(String name, int points) {
-        ClanRegistry.Clan clan=byName(name);
-        if (clan==null || points<=0) return false;
-        clan.influence=(int)Math.min(Integer.MAX_VALUE,(long)clan.influence+points);
-        return save();
+        ClanRegistry.Clan clan = byName(name);
+        if (clan == null || points <= 0) return false;
+        return commit(() -> {
+            int old = clan.influence;
+            clan.influence = (int) Math.min(Integer.MAX_VALUE, (long) old + points);
+            return clan.influence != old;
+        }, "reward-clan");
     }
     boolean disband(ClanRegistry.Clan clan) {
-        if (!registry.disband(clan)) return false;
+        if (!commit(() -> registry.disband(clan), "disband")) return false;
+        // Only clear pending invitations after a *durable* disband.
         invitations.entrySet().removeIf(e -> e.getValue().clanKey().equals(ClanRegistry.key(clan.name)));
-        save(); return true;
+        return true;
     }
     void remember(UUID id, String name) {
         if (id == null || name == null || !name.matches("[A-Za-z0-9_]{3,16}")) return;
-        if (!name.equals(names.put(id, name))) save();
+        String previous = names.put(id, name);
+        if (Objects.equals(name, previous)) return;
+        if (!save()) {
+            if (previous == null) names.remove(id);
+            else names.put(id, previous);
+            logger.severe("CLANS saved nickname rolled back after failed clans.yml write");
+        }
     }
     String knownName(UUID id) { return names.getOrDefault(id, id.toString().substring(0, 8)); }
     UUID memberByName(ClanRegistry.Clan clan, String nickname) {
@@ -56,17 +92,26 @@ final class ClansService {
         if (last != null && now >= last && now - last < cooldownMs) return false;
         lastInvitedBy.put(actor, now);
         long duration = Math.max(1000L, ttlMs);
-        // A misconfigured huge TTL must not wrap into a negative expiry.
         long expiresAt = now > Long.MAX_VALUE - duration ? Long.MAX_VALUE : now + duration;
         invitations.put(target, new Invitation(ClanRegistry.key(clan.name), expiresAt));
         return true;
     }
     ClanRegistry.Clan accept(UUID player, int maxMembers, long now) {
-        Invitation invitation = invitations.remove(player);
-        if (invitation == null || invitation.expiresAt() < now) return null;
+        Invitation invitation = invitations.get(player);
+        if (invitation == null) return null;
+        if (invitation.expiresAt() < now) {
+            invitations.remove(player);
+            return null;
+        }
         ClanRegistry.Clan clan = byName(invitation.clanKey());
-        if (clan == null || !registry.addMember(clan, player, maxMembers)) return null;
-        save(); return clan;
+        if (clan == null) {
+            invitations.remove(player);
+            return null;
+        }
+        if (!commit(() -> registry.addMember(clan, player, maxMembers), "accept-invitation"))
+            return null;
+        invitations.remove(player);
+        return clan;
     }
     void load() {
         if (!file.isFile()) return;

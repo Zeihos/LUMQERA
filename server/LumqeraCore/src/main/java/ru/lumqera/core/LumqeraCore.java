@@ -21,7 +21,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.*;
 
-/** LUMQERA v1.0.0-RC12: PvP, clans, GUI shop and trades. */
+/** LUMQERA v1.0.0-RC13: PvP, clans, GUI shop and trades. */
 public final class LumqeraCore extends JavaPlugin implements CommandExecutor, TabCompleter, Listener {
     private static final String PREFIX = "§5§lLUMQERA §8» §r";
     private ClansService clans;
@@ -166,8 +166,8 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
         Bukkit.getScheduler().runTaskTimer(this, travelManager::tick, 10L, 10L);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             long now=System.currentTimeMillis();
-            for (WarRegistry.Finish finish:wars.state().tick(now)) announceWar(finish);
-            // War expiry is rare; save each tick only when a war actually ended.
+            for (WarRegistry.Finish finish:wars.finishExpired(now)) announceWar(finish);
+            // Expiry is announced only after WarService persisted the result.
         }, 100L, 100L);
         Bukkit.getScheduler().runTaskTimer(this, () -> outposts.tick(System.currentTimeMillis(),
                 Math.max(1,getConfig().getInt("outposts.min-members",2)),
@@ -179,7 +179,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
         long ticks = Math.max(20L, getConfig().getLong("export.interval-seconds", 60L) * 20L);
         Bukkit.getScheduler().runTaskTimer(this, exporter::export, ticks, ticks);
         startupComplete = true;
-        getLogger().info("LUMQERA Core v1.0.0-RC12 started with " + clans.all().size() + " clans and " + land.state().allClaims().size() + " claims");
+        getLogger().info("LUMQERA Core v1.0.0-RC13 started with " + clans.all().size() + " clans and " + land.state().allClaims().size() + " claims");
         } catch (RuntimeException ex) {
             startupComplete = false;
             getLogger().severe("STARTUP FAILED: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
@@ -413,7 +413,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
 
     private boolean adminCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-            send(sender, "§dLumqeraCore §fv1.0.0-RC12 §7| Кланов: §f" + clans.all().size() + " §7| Чанков: §f" + land.state().allClaims().size());
+            send(sender, "§dLumqeraCore §fv1.0.0-RC13 §7| Кланов: §f" + clans.all().size() + " §7| Чанков: §f" + land.state().allClaims().size());
             send(sender, "§7Игроки: §f/claim, /unclaim, /claims, /top clans, /top pvp, /balance, /pay");
             if (sender.hasPermission("lumqera.admin")) {
                 send(sender, "§d/lumqera status §7— диагностика состояния игрового ядра");
@@ -431,7 +431,7 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
         }
         if (!sender.hasPermission("lumqera.admin")) { send(sender, "§cНедостаточно прав."); return true; }
         if (args[0].equalsIgnoreCase("status")) {
-            send(sender, "§dLUMQERA §fv1.0.0-RC12 §7| Paper: §f" + Bukkit.getBukkitVersion());
+            send(sender, "§dLUMQERA §fv1.0.0-RC13 §7| Paper: §f" + Bukkit.getBukkitVersion());
             send(sender, "§7Онлайн: §f" + Bukkit.getOnlinePlayers().size() + "§7 | Кланы: §f" + clans.all().size()
                     + "§7 | Чанки: §f" + land.state().allClaims().size()
                     + "§7 | Аванпосты: §f" + outposts.state().all().size());
@@ -513,23 +513,31 @@ public final class LumqeraCore extends JavaPlugin implements CommandExecutor, Ta
                 ClanRegistry.Clan attackerClan=clans.of(killerId);
                 ClanRegistry.Clan defenderClan=clans.of(victim.getUniqueId());
                 if (attackerClan != null && defenderClan != null) {
-                    WarRegistry.Hit warHit=wars.state().creditedKill(attackerClan.name, defenderClan.name, System.currentTimeMillis());
-                    if (warHit.counted()) {
-                        wars.save();
+                    WarRegistry.Hit warHit=wars.creditedKill(attackerClan.name, defenderClan.name, System.currentTimeMillis());
+                    if (warHit.storageError()) {
+                        send(killer, "§cНе удалось сохранить очко войны. Сообщите администрации.");
+                    } else if (warHit.counted()) {
                         if (warHit.ended()!=null) announceWar(warHit.ended());
                         else Bukkit.broadcastMessage(PREFIX+"§dВойна: §f"+attackerClan.name+" §dполучил очко за убийство " + defenderClan.name);
                     }
                 }
             }
             int points = Math.max(0, getConfig().getInt("pvp.clan-influence-per-kill", 3));
-            if (points > 0) clans.reward(killerId, points);
+            boolean eligibleInfluence = killerId != null && points > 0 && clans.of(killerId) != null;
+            boolean influenceSaved = eligibleInfluence && clans.reward(killerId, points);
+            if (eligibleInfluence && !influenceSaved) {
+                getLogger().severe("PVP clan influence was not saved for " + killerId);
+                if (killer != null) send(killer, "§cВлияние клана не сохранено. Сообщите администрации.");
+            }
             long coins = Math.max(0L, getConfig().getLong("economy.coins-per-credited-kill", 20L));
             if (killerId != null && coins > 0 && economy.ensure(killerId)) {
                 EconomyRegistry.Code earned = economy.reward(killerId, coins);
                 if (earned == EconomyRegistry.Code.OK) send(killer, "§6+" + coins + " монет §7за PvP-победу.");
                 else getLogger().warning("PVP reward skipped (" + earned + ") for " + killerId);
             }
-            if (killer != null) send(killer, "§aПобеда засчитана! §7+" + points + " влияния клану (если в клане).");
+            if (killer != null) send(killer, influenceSaved
+                    ? "§aПобеда засчитана! §7+" + points + " влияния клану."
+                    : "§aПобеда засчитана! §7Влияние не начислено.");
         } else if (result == CombatRegistry.Result.FARM_BLOCKED && killer != null) {
             send(killer, "§eПовторное убийство этого игрока не учитывается в рейтинге (антифарм).");
         } else if (result == CombatRegistry.Result.PERSISTENCE_FAILED && killer != null) {

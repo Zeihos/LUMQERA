@@ -22,6 +22,39 @@ final class ClanRegistry {
     private final Map<String, Clan> clans = new LinkedHashMap<>();
     private final Map<UUID, String> membership = new HashMap<>();
 
+    /** A reversible snapshot; rollback restores the *original* Clan objects.
+     * Commands and other services may still hold these references. */
+    record ClanState(Clan reference, UUID owner, List<UUID> members, List<UUID> officers, int influence) {}
+    record Snapshot(Map<String, ClanState> entries) {}
+
+    Snapshot snapshot() {
+        Map<String, ClanState> copy = new LinkedHashMap<>();
+        for (var entry : clans.entrySet()) {
+            Clan clan = entry.getValue();
+            copy.put(entry.getKey(), new ClanState(clan, clan.owner,
+                    List.copyOf(clan.members), List.copyOf(clan.officers), clan.influence));
+        }
+        return new Snapshot(copy);
+    }
+
+    void restore(Snapshot snapshot) {
+        Objects.requireNonNull(snapshot);
+        clans.clear();
+        membership.clear();
+        for (var entry : snapshot.entries().entrySet()) {
+            ClanState previous = entry.getValue();
+            Clan clan = previous.reference();
+            clan.owner = previous.owner();
+            clan.members.clear();
+            clan.members.addAll(previous.members());
+            clan.officers.clear();
+            clan.officers.addAll(previous.officers());
+            clan.influence = previous.influence();
+            clans.put(entry.getKey(), clan);
+            for (UUID member : clan.members) membership.put(member, entry.getKey());
+        }
+    }
+
     static String key(String name) { return name.toLowerCase(Locale.ROOT); }
     static boolean validName(String name) { return name != null && name.matches("[A-Za-z0-9_]{3,12}"); }
     Collection<Clan> all() { return Collections.unmodifiableCollection(clans.values()); }
