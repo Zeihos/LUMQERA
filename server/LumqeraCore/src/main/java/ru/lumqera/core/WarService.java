@@ -13,6 +13,50 @@ final class WarService {
     private final WarRegistry state = new WarRegistry();
     WarService(File folder,Logger logger) { file=new File(folder,"wars.yml"); this.logger=logger; }
     WarRegistry state() { return state; }
+
+    /** Commits a new active war or restores both challenges and war state on I/O failure. */
+    WarRegistry.Result accept(String defender, String attacker, long now, long durationMs, int goal) {
+        WarRegistry.Snapshot previous = state.snapshot();
+        WarRegistry.Result result = state.accept(defender, attacker, now, durationMs, goal);
+        if (result != WarRegistry.Result.OK) return result;
+        if (save()) return result;
+        state.restore(previous);
+        logger.severe("WAR ACCEPT rolled back because wars.yml could not be saved");
+        return WarRegistry.Result.STORAGE_ERROR;
+    }
+
+    /** A PvP win must not count toward a clan war until its score is durable. */
+    WarRegistry.Hit creditedKill(String killer, String victim, long now) {
+        WarRegistry.Snapshot previous = state.snapshot();
+        WarRegistry.Hit result = state.creditedKill(killer, victim, now);
+        if (!result.counted()) return result;
+        if (save()) return result;
+        state.restore(previous);
+        logger.severe("WAR HIT rolled back because wars.yml could not be saved");
+        return new WarRegistry.Hit(false, null, true);
+    }
+
+    /** Finalize timed wars exactly once and persist their lifetime records before announcement. */
+    List<WarRegistry.Finish> finishExpired(long now) {
+        WarRegistry.Snapshot previous = state.snapshot();
+        List<WarRegistry.Finish> results = state.tick(now);
+        if (results.isEmpty()) return results;
+        if (save()) return results;
+        state.restore(previous);
+        logger.severe("WAR EXPIRY rolled back because wars.yml could not be saved");
+        return List.of();
+    }
+
+    record Surrender(WarRegistry.Finish finish, boolean storageError) {}
+    Surrender surrender(String clan) {
+        if (state.war(clan) == null) return new Surrender(null, false);
+        WarRegistry.Snapshot previous = state.snapshot();
+        WarRegistry.Finish result = state.surrender(clan);
+        if (save()) return new Surrender(result, false);
+        state.restore(previous);
+        logger.severe("WAR SURRENDER rolled back because wars.yml could not be saved");
+        return new Surrender(null, true);
+    }
     /** A partial war restore would erase dropped matches on the next save. Refuse to start. */
     void load(ClansService clans) {
         if (!file.isFile()) return;
