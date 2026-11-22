@@ -1,5 +1,5 @@
 name: LumqeraCore
-version: '1.0.0-RC9'
+version: '1.0.0-RC10'
 main: ru.lumqera.core.LumqeraCore
 api-version: '26.3'
 author: LUMQERA

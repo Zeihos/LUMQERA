@@ -61,6 +61,7 @@ final class LandCommands implements CommandExecutor, TabCompleter {
             case NOT_ADJACENT -> send(p, "§cНовая территория должна граничить с вашей по стороне.");
             case NOT_OWNED -> send(p, "§cЭтот чанк не принадлежит твоему клану.");
             case DISCONNECTED -> send(p, "§cНельзя разделить территорию на несвязанные части.");
+            case STORAGE_ERROR -> send(p, "§cНе удалось сохранить изменения территории. Сообщите администрации.");
             default -> send(p, "§cОперация отклонена.");
         }
         return true;

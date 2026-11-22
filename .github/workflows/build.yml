@@ -62,7 +62,7 @@ jobs:
         shell: pwsh
         run: |
           $paper = Join-Path $env:RUNNER_TEMP 'lumqera-test-paper'
-          $jar = 'server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC9.jar'
+          $jar = 'server/LumqeraCore/build/libs/LumqeraCore-1.0.0-RC10.jar'
           ./deploy-plugin-windows.ps1 -Source $jar -ServerDir $paper -NonInteractive
           if (-not (Test-Path "$paper/plugins/LumqeraCore.jar")) { throw 'No installed plugin JAR' }
           ./deploy-plugin-windows.ps1 -Source $jar -ServerDir $paper -NonInteractive
