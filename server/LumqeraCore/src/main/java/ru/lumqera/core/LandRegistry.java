@@ -11,8 +11,13 @@ final class LandRegistry {
             return new Chunk(world, Math.floorDiv(blockX, 16), Math.floorDiv(blockZ, 16));
         }
         List<Chunk> adjacent() {
-            return List.of(new Chunk(world, x + 1, z), new Chunk(world, x - 1, z),
-                    new Chunk(world, x, z + 1), new Chunk(world, x, z - 1));
+            // Integer overflow must never make opposite edges of a world adjacent.
+            List<Chunk> result = new ArrayList<>(4);
+            if (x < Integer.MAX_VALUE) result.add(new Chunk(world, x + 1, z));
+            if (x > Integer.MIN_VALUE) result.add(new Chunk(world, x - 1, z));
+            if (z < Integer.MAX_VALUE) result.add(new Chunk(world, x, z + 1));
+            if (z > Integer.MIN_VALUE) result.add(new Chunk(world, x, z - 1));
+            return result;
         }
     }
     record Zone(String name, UUID world, int centerX, int centerZ, int radius) {
@@ -28,7 +33,7 @@ final class LandRegistry {
                     && minZ <= (long)centerZ + radius && minZ + 15 >= (long)centerZ - radius;
         }
     }
-    enum Result { OK, INVALID_CLAN, ALREADY_CLAIMED, LIMIT_REACHED, NOT_ADJACENT, NOT_OWNED, DISCONNECTED, SAFE_ZONE }
+    enum Result { OK, INVALID_CLAN, ALREADY_CLAIMED, LIMIT_REACHED, NOT_ADJACENT, NOT_OWNED, DISCONNECTED, SAFE_ZONE, STORAGE_ERROR }
 
     private final Map<Chunk, String> claims = new HashMap<>();
     private final Map<String, Zone> zones = new TreeMap<>();
@@ -68,6 +73,10 @@ final class LandRegistry {
             return Result.NOT_ADJACENT;
         claims.put(chunk, id);
         return Result.OK;
+    }
+    /** Undo a newly created claim after a failed disk write, independent of topology. */
+    boolean rollbackClaim(String clan, Chunk chunk) {
+        return clan != null && claims.remove(chunk, key(clan));
     }
     Result unclaim(String clan, Chunk chunk) {
         if (clan == null || !key(clan).equals(owner(chunk))) return Result.NOT_OWNED;
