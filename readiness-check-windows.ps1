@@ -1,4 +1,4 @@
-# LUMQERA RC11 - local readiness report (no network calls or writes).
+# LUMQERA RC12 - local readiness report (no network calls or writes).
 $ErrorActionPreference = 'Continue'
 $root = $PSScriptRoot
 $problems = [System.Collections.Generic.List[string]]::new()
@@ -9,7 +9,7 @@ function Check([bool]$condition, [string]$message, [string]$help) {
         $script:problems.Add($help)
     }
 }
-Write-Host 'LUMQERA 1.0.0-RC11 - Paper readiness' -ForegroundColor Cyan
+Write-Host 'LUMQERA 1.0.0-RC12 - Paper readiness' -ForegroundColor Cyan
 $javaPaths = [System.Collections.Generic.List[string]]::new()
 if ($env:JDK25_HOME) { $javaPaths.Add((Join-Path $env:JDK25_HOME 'bin\java.exe')) }
 if ($env:JAVA_HOME) { $javaPaths.Add((Join-Path $env:JAVA_HOME 'bin\java.exe')) }
