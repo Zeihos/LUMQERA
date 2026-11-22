@@ -4,7 +4,7 @@ import java.util.*;
 
 /** Deterministic war engine. Main-thread-only, independent of Bukkit. */
 final class WarRegistry {
-    enum Result { OK, INVALID, SELF, NOT_FOUND, PENDING, ALREADY_BUSY, EXPIRED, NOT_AUTHORIZED }
+    enum Result { OK, INVALID, SELF, NOT_FOUND, PENDING, ALREADY_BUSY, EXPIRED, NOT_AUTHORIZED, STORAGE_ERROR }
     record Challenge(String attacker, String defender, long expiresAt) {}
     record Finish(String winner, String loser, boolean draw, String reason) {}
     static final class War {
@@ -20,12 +20,33 @@ final class WarRegistry {
         String other(String clan) { return a.equals(key(clan)) ? b : a; }
         int score(String clan) { return a.equals(key(clan)) ? aScore : bScore; }
     }
-    record Hit(boolean counted, Finish ended) {}
+    record Hit(boolean counted, Finish ended, boolean storageError) {
+        Hit(boolean counted, Finish ended) { this(counted, ended, false); }
+    }
+    /** Deep copy of mutable war scores and historic totals for disk-failure rollback. */
+    record Snapshot(Map<String, Challenge> challenges, List<War> wars,
+                    Map<String, Integer> wins, Map<String, Integer> losses, Map<String, Integer> draws) {}
     private final Map<String, Challenge> challenges = new HashMap<>();
     private final List<War> active = new ArrayList<>();
     private final Map<String,Integer> wins = new HashMap<>();
     private final Map<String,Integer> losses = new HashMap<>();
     private final Map<String,Integer> draws = new HashMap<>();
+    Snapshot snapshot() {
+        List<War> copies = new ArrayList<>();
+        for (War w : active) copies.add(new War(w.a, w.b, w.endsAt, w.goal, w.aScore, w.bScore));
+        return new Snapshot(new HashMap<>(challenges), copies,
+                new HashMap<>(wins), new HashMap<>(losses), new HashMap<>(draws));
+    }
+    void restore(Snapshot previous) {
+        Objects.requireNonNull(previous);
+        challenges.clear(); challenges.putAll(previous.challenges());
+        active.clear();
+        for (War w : previous.wars())
+            active.add(new War(w.a, w.b, w.endsAt, w.goal, w.aScore, w.bScore));
+        wins.clear(); wins.putAll(previous.wins());
+        losses.clear(); losses.putAll(previous.losses());
+        draws.clear(); draws.putAll(previous.draws());
+    }
     private static String key(String clan) { return clan == null ? "" : ClanRegistry.key(clan); }
     private static boolean valid(String clan) { return ClanRegistry.validName(clan); }
     Collection<War> active() { return Collections.unmodifiableCollection(active); }
@@ -56,7 +77,7 @@ final class WarRegistry {
         return c.expiresAt <= now ? Result.EXPIRED : Result.OK;
     }
     Result accept(String to, String from, long now, long durationMs, int goal) {
-        if (durationMs <= 0 || goal < 1) return Result.INVALID;
+        if (now < 0 || durationMs <= 0 || goal < 1 || goal > 1000) return Result.INVALID;
         Challenge c=challengeFor(to);
         if (c==null || !c.attacker.equals(key(from))) return Result.NOT_FOUND;
         challenges.remove(key(to));
@@ -71,7 +92,8 @@ final class WarRegistry {
         War w=war(killer);
         if (w==null || victim==null || !w.other(killer).equals(key(victim)) || now >= w.endsAt)
             return new Hit(false,null);
-        if (w.a.equals(key(killer))) w.aScore++; else w.bScore++;
+        if (w.a.equals(key(killer))) w.aScore = Math.min(w.goal, w.aScore + 1);
+        else w.bScore = Math.min(w.goal, w.bScore + 1);
         Finish finish = Math.max(w.aScore,w.bScore) >= w.goal ? finish(w,"score") : null;
         return new Hit(true,finish);
     }

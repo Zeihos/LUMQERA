@@ -1,7 +1,7 @@
 plugins { java }
 
 group = "ru.lumqera"
-version = "1.0.0-RC10"
+version = "1.0.0-RC11"
 
 repositories {
     mavenCentral()

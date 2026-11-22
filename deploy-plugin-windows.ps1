@@ -1,4 +1,4 @@
-# LUMQERA RC10 - checked, recoverable deployment for a stopped Paper server.
+# LUMQERA RC11 - checked, recoverable deployment for a stopped Paper server.
 # Run via deploy-plugin-windows.bat, or supply Source/ServerDir for automation.
 param(
     [string]$Source,
@@ -7,7 +7,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($Source)) {
-    $Source = Join-Path $PSScriptRoot 'server\LumqeraCore\build\libs\LumqeraCore-1.0.0-RC10.jar'
+    $Source = Join-Path $PSScriptRoot 'server\LumqeraCore\build\libs\LumqeraCore-1.0.0-RC11.jar'
 }
 if ([string]::IsNullOrWhiteSpace($ServerDir)) {
     $ServerDir = Join-Path $PSScriptRoot 'server\paper'
@@ -28,8 +28,8 @@ try {
         if ($manifest -notmatch '(?m)^name:\s*LumqeraCore\s*$') {
             throw 'JAR has the wrong plugin name.'
         }
-        if ($manifest -notmatch '(?m)^version:\s*.*1\.0\.0-RC10.*$') {
-            throw 'JAR is not LumqeraCore 1.0.0-RC10; refusing to install an unexpected version.'
+        if ($manifest -notmatch '(?m)^version:\s*.*1\.0\.0-RC11.*$') {
+            throw 'JAR is not LumqeraCore 1.0.0-RC11; refusing to install an unexpected version.'
         }
     } finally { $jar.Dispose() }
 

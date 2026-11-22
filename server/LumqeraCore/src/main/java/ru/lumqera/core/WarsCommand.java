@@ -49,11 +49,10 @@ final class WarsCommand implements CommandExecutor, TabCompleter {
             if (other==null) { tell(sender,"§cКлан не найден.");return true; }
             WarRegistry.Result result=switch(action) {
                 case "challenge" -> wars.state().challenge(clan.name,other.name,now,inviteMs);
-                case "accept" -> wars.state().accept(clan.name,other.name,now,durationMs,goal);
+                case "accept" -> wars.accept(clan.name,other.name,now,durationMs,goal);
                 default -> wars.state().decline(clan.name,other.name,now);
             };
             if (result==WarRegistry.Result.OK) {
-                if (action.equals("accept")) wars.save();
                 if (action.equals("accept")) Bukkit.broadcastMessage(PREFIX+"§dВойна кланов: §f"+clan.name+" §dпротив §f"+other.name+"§d! Цель — §f"+goal+"§d убийств.");
                 else if (action.equals("challenge")) {
                     tell(sender,"§aВызов отправлен клану §f"+other.name+"§a. Срок — "+inviteMs/1000+" сек.");
@@ -64,9 +63,10 @@ final class WarsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         if (action.equals("surrender") && args.length==2 && args[1].equalsIgnoreCase("confirm")) {
-            WarRegistry.Finish finish=wars.state().surrender(clan.name);
-            if (finish==null) tell(sender,"§cТвой клан сейчас не участвует в войне.");
-            else { wars.save(); Bukkit.broadcastMessage(PREFIX+"§dКлан §f"+clan.name+" §dсдался. Победитель: §a"+finish.winner()); }
+            WarService.Surrender outcome=wars.surrender(clan.name);
+            if (outcome.storageError()) tell(sender,"§cНе удалось сохранить результат войны. Сдача отменена; сообщите администрации.");
+            else if (outcome.finish()==null) tell(sender,"§cТвой клан сейчас не участвует в войне.");
+            else Bukkit.broadcastMessage(PREFIX+"§dКлан §f"+clan.name+" §dсдался. Победитель: §a"+outcome.finish().winner());
             return true;
         }
         tell(sender,"§cИспользование: /war help"); return true;
