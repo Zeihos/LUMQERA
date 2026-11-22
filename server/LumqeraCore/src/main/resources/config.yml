@@ -1,4 +1,4 @@
-# LUMQERA Core v1.0.0-RC12 — перезапустите сервер после изменения конфигурации.
+# LUMQERA Core v1.0.0-RC13 — перезапустите сервер после изменения конфигурации.
 clans:
   max-members: 10
   invite-timeout-seconds: 300
